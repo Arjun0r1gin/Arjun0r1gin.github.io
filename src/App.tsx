@@ -7,6 +7,7 @@ import { useViewport } from './animations/hooks/useViewport';
 import { useSectionProgress } from './animations/hooks/useSectionProgress';
 import { useAnimationReady } from './animations/hooks/useAnimationReady';
 import { useAnimationStore } from './animations/engine/animationStore';
+import Chapter4Assembly from './components/chapters/Chapter4Assembly';
 import gsap from 'gsap';
 
 // Main App wrapped in the AnimationProvider
@@ -129,8 +130,11 @@ const DemoContent: React.FC = () => {
 
       <section ref={section3Ref} style={styles.section}>
         <div style={styles.sectionLabel}>[ CHAPTER 03: OPERATOR PROFILE ]</div>
-        <div style={styles.sectionSubtitle}>Scroll back up to return</div>
+        <div style={styles.sectionSubtitle}>Keep scrolling for assembly sequence</div>
       </section>
+
+      {/* Chapter 4: pinned, scroll-scrubbed rocket assembly */}
+      <Chapter4Assembly />
     </div>
   );
 };
