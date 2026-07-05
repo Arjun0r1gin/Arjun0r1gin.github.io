@@ -23,9 +23,9 @@ const resolveImage = (imagePath) => planetImages[imagePath] ?? imagePath;
 /* ------------------------------------------------------------------ *
  * TRACK-WIDTH CALCULATION
  *
- * Pinned horizontal track scrolls across 2.4 viewports (240vw).
+ * Pinned horizontal track scrolls across 3.4 viewports (340vw).
  * ------------------------------------------------------------------ */
-const TRACK_VW = 240;
+const TRACK_VW = 340;
 const TRAVEL_VW = TRACK_VW - 100; // horizontal distance the camera pans
 const PIN_END = `+=${TRAVEL_VW}%`; // ScrollTrigger end (percent of viewport height)
 
@@ -137,11 +137,20 @@ function BeltScene() {
 
   /* ---- Flat horizontal slots layout matching the Wix Studio reference ---- */
   const slots = useMemo(() => {
-    // 4 celestial bodies: Large Planet -> Small Moon -> Medium Planet -> Large Planet
-    const positions = [15, 80, 140, 225];
-    const sizes = [34, 10, 22, 34];
-    const verticalOffsets = [-8, 8, -8, 8]; // wave-like vertical alignment
-    const desktopIds = ['rakshastra', 'eznotes', 'epsat', 'cyberlab'];
+    // 8 celestial bodies with decreased gaps and wave-like vertical alignment
+    const positions = [15, 55, 95, 135, 175, 215, 260, 310];
+    const sizes = [32, 10, 20, 30, 22, 32, 11, 34];
+    const verticalOffsets = [-7, 7, -7, 7, -7, 7, -7, 7];
+    const desktopIds = [
+      'rakshastra',
+      'eznotes',
+      'epsat',
+      'cyberlab',
+      'guardcharge',
+      'orbit-alert',
+      'telemetry-db',
+      'payload-triage',
+    ];
 
     return desktopIds.map((id, index) => {
       const p = projects.find((proj) => proj.id === id);
@@ -204,7 +213,7 @@ function BeltScene() {
   );
 
   const renderConnectorAndLabel = (id) => {
-    // Connector mapping matching Wix Studio composition
+    // Connector mapping matching Wix Studio composition across 8 planets
     const connectorData = {
       rakshastra: {
         label: 'KEEP',
@@ -234,13 +243,49 @@ function BeltScene() {
         labelTop: '-30%',
       },
       cyberlab: {
-        label: 'W.',
-        x1: '100%',
-        y1: '50%',
-        x2: '115%',
-        y2: '50%',
-        labelLeft: '115%',
-        labelTop: '50%',
+        label: 'SEE',
+        x1: '70%',
+        y1: '70%',
+        x2: '95%',
+        y2: '130%',
+        labelLeft: '95%',
+        labelTop: '130%',
+      },
+      guardcharge: {
+        label: 'WHAT',
+        x1: '70%',
+        y1: '30%',
+        x2: '125%',
+        y2: '-25%',
+        labelLeft: '125%',
+        labelTop: '-25%',
+      },
+      'orbit-alert': {
+        label: 'IDEAS',
+        x1: '70%',
+        y1: '70%',
+        x2: '95%',
+        y2: '130%',
+        labelLeft: '95%',
+        labelTop: '130%',
+      },
+      'telemetry-db': {
+        label: 'I',
+        x1: '70%',
+        y1: '30%',
+        x2: '130%',
+        y2: '-30%',
+        labelLeft: '130%',
+        labelTop: '-30%',
+      },
+      'payload-triage': {
+        label: 'BUILT',
+        x1: '70%',
+        y1: '70%',
+        x2: '90%',
+        y2: '130%',
+        labelLeft: '90%',
+        labelTop: '130%',
       },
     };
 
