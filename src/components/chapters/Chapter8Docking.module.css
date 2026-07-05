@@ -1,0 +1,192 @@
+/*
+ * Chapter 8: Docking Station — co-located CSS module.
+ * Deep space docking theme with interactive spacecraft links.
+ */
+
+.section {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background: var(--void-0, #030308);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 80px 24px;
+  box-sizing: border-box;
+}
+
+/* ============================================================
+   CONTAINER & LAYOUT
+   ============================================================ */
+.container {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+  text-align: center;
+}
+
+/* ============================================================
+   MISSION COMPLETE TEXT
+   ============================================================ */
+.missionComplete {
+  font-family: var(--font-display, 'Inter', system-ui, sans-serif);
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 300;
+  letter-spacing: 6px;
+  color: var(--ink-0, #e8e9ef);
+  text-transform: uppercase;
+  margin-top: 0;
+  margin-bottom: 24px;
+  opacity: 0; /* Managed by GSAP ScrollTrigger */
+  transform: translateY(15px);
+}
+
+.subTitle {
+  font-family: var(--font-terminal, ui-monospace, 'Courier New', monospace);
+  font-size: clamp(11px, 1.5vw, 14px);
+  letter-spacing: 3px;
+  color: var(--signal-teal, #8fd8d2);
+  text-transform: uppercase;
+  margin-bottom: 48px;
+  opacity: 0.75;
+}
+
+/* ============================================================
+   SPACECRAFT LINKS
+   ============================================================ */
+.linksGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 420px;
+  margin-bottom: 60px;
+}
+
+.linkItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(8, 6, 13, 0.7);
+  border: 1px solid rgba(143, 216, 210, 0.15);
+  border-radius: 6px;
+  padding: 16px 24px;
+  color: var(--signal-teal, #8fd8d2);
+  font-family: var(--font-terminal, ui-monospace, 'Courier New', monospace);
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: 
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    transform 200ms ease,
+    color 200ms ease;
+  outline: none;
+}
+
+.linkItem:hover,
+.linkItem:focus-visible {
+  border-color: var(--signal-teal, #8fd8d2);
+  box-shadow: 0 0 20px rgba(143, 216, 210, 0.25);
+  transform: scale(1.03);
+  color: var(--ink-0, #e8e9ef);
+}
+
+/* Engine Light indicator */
+.engineIndicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.engineDot {
+  width: 6px;
+  height: 6px;
+  background: var(--signal-teal, #8fd8d2);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--signal-teal, #8fd8d2);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.linkItem:hover .engineDot,
+.linkItem:focus-visible .engineDot {
+  opacity: 1;
+  animation: enginePulse 1.5s infinite ease-in-out;
+}
+
+@keyframes enginePulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* ============================================================
+   ENGINEER CHARACTER RETURN PLACEHOLDER
+   ============================================================ */
+.characterPlaceholder {
+  width: clamp(140px, 20vw, 240px);
+  height: clamp(200px, 30vw, 300px);
+  background: linear-gradient(
+    180deg,
+    rgba(143, 216, 210, 0.05) 0%,
+    rgba(143, 216, 210, 0.01) 80%,
+    transparent 100%
+  );
+  border: 1px dashed rgba(143, 216, 210, 0.15);
+  border-bottom: none;
+  border-radius: 100px 100px 0 0;
+  position: relative;
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-terminal, ui-monospace, 'Courier New', monospace);
+  font-size: 10px;
+  color: rgba(143, 216, 210, 0.35);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.characterPlaceholder::before {
+  content: '';
+  position: absolute;
+  top: 15%;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(143, 216, 210, 0.06);
+}
+
+/* ============================================================
+   REDUCED MOTION OVERRIDES
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .missionComplete {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .linkItem {
+    transition: none !important;
+  }
+  .linkItem:hover,
+  .linkItem:focus-visible {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  .engineDot {
+    animation: none !important;
+  }
+}

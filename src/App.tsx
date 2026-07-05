@@ -3,6 +3,7 @@ import Chapter1Initialize from './components/chapters/Chapter1Initialize';
 import Chapter3Operator from './components/chapters/Chapter3Operator';
 import Chapter4Assembly from './components/chapters/Chapter4Assembly';
 import Chapter7Transmission from './components/chapters/Chapter7Transmission';
+import Chapter8Docking from './components/chapters/Chapter8Docking';
 
 function App() {
   return (
@@ -39,6 +40,9 @@ function App() {
 
       {/* Chapter 7: Encrypted Transmission — intentionally quiet */}
       <Chapter7Transmission />
+
+      {/* Chapter 8: Docking Station — Connection */}
+      <Chapter8Docking />
     </AnimationProvider>
   );
 }
