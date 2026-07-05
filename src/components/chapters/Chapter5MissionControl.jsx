@@ -21,60 +21,17 @@ const planetImages = import.meta.glob('/src/assets/planets/*.png', {
 const resolveImage = (imagePath) => planetImages[imagePath] ?? imagePath;
 
 /* ------------------------------------------------------------------ *
- * Instructional callout words — one ordered array, fully independent
- * of projects.js. Edit freely; anchors redistribute automatically.
+ * TRACK-WIDTH CALCULATION
+ *
+ * Pinned horizontal track scrolls across 2.4 viewports (240vw).
  * ------------------------------------------------------------------ */
-const CALLOUT_WORDS = [
-  'KEEP',
-  'SCROLLING',
-  'TO',
-  'EXPLORE',
-  'THE',
-  'MISSIONS',
-  "I'VE",
-  'BUILT',
-];
-
-/* ------------------------------------------------------------------ *
- * TRACK-WIDTH CALCULATION (the one number everything hangs off)
- *
- * Track width scales with how many bodies exist in the data array:
- *   TRACK_VW = projects.length * 60 (vw), min 200vw
- * so adding a 6th project automatically adds ~60vw of horizontal
- * distance to travel — zero animation-code changes required.
- *
- * Flagships each get an equal slot across that width; moons attach to
- * their parent's slot (they don't get their own slot, but they DO
- * count toward track width, since they add visual density).
- *
- * The pin distance mirrors the travel distance: 1vh of page scroll
- * per 1vw of horizontal camera travel (TRAVEL_VW below).
- * ------------------------------------------------------------------ */
-const TRACK_VW = Math.max(projects.length * 60, 200);
+const TRACK_VW = 240;
 const TRAVEL_VW = TRACK_VW - 100; // horizontal distance the camera pans
 const PIN_END = `+=${TRAVEL_VW}%`; // ScrollTrigger end (percent of viewport height)
 
 // Background grid + ruler move at a slower rate than the planet track
 // for parallax depth (distant backdrop).
 const GRID_PARALLAX = 0.4;
-
-const flagships = projects.filter((p) => p.size !== 'moon');
-const moonsOf = (parentId) =>
-  projects.filter((p) => p.orbitsParentId === parentId);
-
-/* Deterministic per-body layout, derived ONLY from array index + size.
- * Never hand-placed per id. */
-const bodyLayout = (globalIndex, size) => ({
-  // Diameter in vw — flagships large (some crop off viewport edges), moons small
-  sizeVw: size === 'flagship' ? 32 + ((globalIndex * 23) % 3) * 8 : 9,
-  // Vertical drift in vh so the belt isn't mechanically flat
-  yOffVh: ((globalIndex * 53) % 29) - 14,
-  // Self-rotation period, 40–70s
-  spinDur: 40 + ((globalIndex * 7) % 31),
-  // Moon orbit period + starting angle
-  orbitDur: 24 + ((globalIndex * 11) % 20),
-  orbitPhase: (globalIndex * 137) % 360,
-});
 
 const clamp = (v, min, max) => Math.min(Math.max(v, min), max);
 
@@ -101,9 +58,7 @@ function BeltScene() {
   const trackRef = useRef(null);
   const gridRef = useRef(null);
   const rulerRef = useRef(null);
-  const wordRefs = useRef([]);
   const spinTargets = useRef(new Map()); // id -> { el, spinDur }
-  const orbitTargets = useRef(new Map()); // id -> { rotor, inner, orbitDur, orbitPhase }
   const bodyEls = useRef(new Map()); // id -> focusable element
   const [activeId, setActiveId] = useState(null);
 
@@ -138,56 +93,23 @@ function BeltScene() {
       0
     );
 
-    // Word callouts fade in/out from the SAME driving value (timeline
-    // progress), each around its anchor's focus-zone crossing.
-    const win = 0.5 / CALLOUT_WORDS.length;
-    CALLOUT_WORDS.forEach((_, i) => {
-      const el = wordRefs.current[i];
-      if (!el) return;
-      const p = (i + 0.5) / CALLOUT_WORDS.length;
-      gsap.set(el, { autoAlpha: i === 0 ? 1 : 0 });
-      if (i !== 0) {
-        timeline.to(
-          el,
-          { autoAlpha: 1, duration: win, ease: 'none' },
-          clamp(p - win * 1.6, 0, 1 - win)
-        );
-      }
-      timeline.to(
-        el,
-        { autoAlpha: 0, duration: win, ease: 'none' },
-        clamp(p + win * 0.6, 0, 1 - win)
-      );
-    });
-
     return () => {
-      // usePinnedTimeline kills the timeline + ScrollTrigger on unmount;
-      // here we only remove the tweens we added (mode switches re-add them).
       timeline.clear();
     };
   }, [timeline]);
 
-  /* ---- Ambient motion: shared gsap.ticker (scroll-independent) ----
-   * Planets self-rotate (40–70s per index) and moons orbit their parent
-   * continuously, regardless of scroll position or direction. */
+  /* ---- Ambient motion: shared gsap.ticker (scroll-independent) ---- */
   useEffect(() => {
     const tick = (time) => {
       spinTargets.current.forEach(({ el, spinDur }) => {
         gsap.set(el, { rotation: ((time * 360) / spinDur) % 360 });
-      });
-      orbitTargets.current.forEach(({ rotor, inner, orbitDur, orbitPhase }) => {
-        const angle = orbitPhase + ((time * 360) / orbitDur) % 360;
-        gsap.set(rotor, { rotation: angle });
-        // Counter-rotate the moon itself so it doesn't tumble with the rotor.
-        gsap.set(inner, { rotation: -angle });
       });
     };
     gsap.ticker.add(tick);
     return () => gsap.ticker.remove(tick); // clean up ticker callback on unmount
   }, []);
 
-  /* ---- Keyboard reachability: focusing an off-screen body advances
-   * the pinned track's scroll position so it becomes visible. ---- */
+  /* ---- Keyboard reachability: focusing an off-screen body advances ---- */
   const revealBody = (id) => {
     const st = timeline?.scrollTrigger;
     const el = bodyEls.current.get(id);
@@ -213,21 +135,25 @@ function BeltScene() {
   const openMission = (url) =>
     window.open(url, '_blank', 'noopener,noreferrer');
 
-  /* ---- Derived layout (index/size driven — see bodyLayout) ---- */
+  /* ---- Flat horizontal slots layout matching the Wix Studio reference ---- */
   const slots = useMemo(() => {
-    const slotVw = TRACK_VW / flagships.length;
-    return flagships.map((p, fi) => {
-      const globalIndex = projects.indexOf(p);
+    // 4 celestial bodies: Large Planet -> Small Moon -> Medium Planet -> Large Planet
+    const positions = [15, 80, 140, 225];
+    const sizes = [34, 10, 22, 34];
+    const verticalOffsets = [-8, 8, -8, 8]; // wave-like vertical alignment
+    const desktopIds = ['rakshastra', 'eznotes', 'epsat', 'cyberlab'];
+
+    return desktopIds.map((id, index) => {
+      const p = projects.find((proj) => proj.id === id);
+      if (!p) return null;
       return {
         project: p,
-        layout: bodyLayout(globalIndex, p.size),
-        centerVw: (fi + 0.5) * slotVw,
-        moons: moonsOf(p.id).map((m) => ({
-          project: m,
-          layout: bodyLayout(projects.indexOf(m), m.size),
-        })),
+        sizeVw: sizes[index],
+        yOffVh: verticalOffsets[index],
+        centerVw: positions[index],
+        spinDur: 40 + (index * 7) % 31,
       };
-    });
+    }).filter(Boolean);
   }, []);
 
   // Ruler ticks: one every 4vw across the ruler strip.
@@ -237,7 +163,7 @@ function BeltScene() {
     [rulerWidthVw]
   );
 
-  const sharedBodyProps = (p, moonInner) => ({
+  const sharedBodyProps = (p) => ({
     ref: (el) => {
       if (el) bodyEls.current.set(p.id, el);
       else bodyEls.current.delete(p.id);
@@ -250,7 +176,7 @@ function BeltScene() {
     style: { '--accent': p.accentColor },
     className: `c5-body c5-body--${p.size}${
       activeId === p.id ? ' is-active' : ''
-    }${moonInner ? ' c5-body--orbiting' : ''}`,
+    }`,
     onMouseEnter: () => setActiveId(p.id),
     onMouseLeave: () => setActiveId((cur) => (cur === p.id ? null : cur)),
     onFocus: () => {
@@ -276,6 +202,73 @@ function BeltScene() {
       <span className="c5-card__blurb">{p.blurb}</span>
     </span>
   );
+
+  const renderConnectorAndLabel = (id) => {
+    // Connector mapping matching Wix Studio composition
+    const connectorData = {
+      rakshastra: {
+        label: 'KEEP',
+        x1: '70%',
+        y1: '70%',
+        x2: '85%',
+        y2: '130%',
+        labelLeft: '85%',
+        labelTop: '130%',
+      },
+      eznotes: {
+        label: 'SCROLLING',
+        x1: '70%',
+        y1: '70%',
+        x2: '130%',
+        y2: '130%',
+        labelLeft: '130%',
+        labelTop: '130%',
+      },
+      epsat: {
+        label: 'TO',
+        x1: '70%',
+        y1: '30%',
+        x2: '120%',
+        y2: '-30%',
+        labelLeft: '120%',
+        labelTop: '-30%',
+      },
+      cyberlab: {
+        label: 'W.',
+        x1: '100%',
+        y1: '50%',
+        x2: '115%',
+        y2: '50%',
+        labelLeft: '115%',
+        labelTop: '50%',
+      },
+    };
+
+    const data = connectorData[id];
+    if (!data) return null;
+
+    return (
+      <>
+        <svg className="c5-connector-svg" aria-hidden="true">
+          <line
+            x1={data.x1}
+            y1={data.y1}
+            x2={data.x2}
+            y2={data.y2}
+            className="c5-connector-line"
+          />
+        </svg>
+        <div
+          className="c5-wix-label"
+          style={{ left: data.labelLeft, top: data.labelTop }}
+          aria-hidden="true"
+        >
+          <span className="c5-wix-label__dot" />
+          <span className="c5-wix-label__text">{data.label}</span>
+        </div>
+      </>
+    );
+  };
 
   return (
     <section
@@ -317,51 +310,33 @@ function BeltScene() {
         <i />
       </div>
 
+      {/* "Built on WIX STUDIO" Badge in the bottom-right corner */}
+      <div className="c5-badge" style={{ zIndex: Z_INDEX.UI_LAYER }} aria-hidden="true">
+        <i />
+        Built on <strong>WIX STUDIO</strong>
+      </div>
+
       {/* THE TRACK — wider than the viewport, panned via translateX */}
       <div
         ref={trackRef}
         className="c5-track"
         style={{ width: `${TRACK_VW}vw`, zIndex: Z_INDEX.FOREGROUND }}
       >
-        {/* Word callouts: anchored dots + leader lines along the track */}
-        {CALLOUT_WORDS.map((word, i) => {
-          const p = (i + 0.5) / CALLOUT_WORDS.length;
-          // Positioned so the word is screen-centered exactly when the
-          // track progress reaches its anchor point.
-          const leftVw = 50 + p * TRAVEL_VW;
-          return (
-            <span
-              key={word + i}
-              ref={(el) => {
-                wordRefs.current[i] = el;
-              }}
-              className="c5-word"
-              style={{ left: `${leftVw}vw` }}
-              aria-hidden="true"
-            >
-              {word}
-              <i className="c5-word__line" />
-              <i className="c5-word__dot" />
-            </span>
-          );
-        })}
-
-        {/* Planets: one slot per flagship, moons nested on orbit rotors */}
-        {slots.map(({ project: p, layout, centerVw, moons }) => (
+        {slots.map(({ project: p, sizeVw, yOffVh, centerVw, spinDur }) => (
           <div
             key={p.id}
             className="c5-slot"
             style={{
               left: `${centerVw}vw`,
-              top: `calc(50% + ${layout.yOffVh}vh)`,
-              width: `${layout.sizeVw}vw`,
-              height: `${layout.sizeVw}vw`,
+              top: `calc(50% + ${yOffVh}vh)`,
+              width: `${sizeVw}vw`,
+              height: `${sizeVw}vw`,
             }}
           >
-            <a {...sharedBodyProps(p, false)}>
+            <a {...sharedBodyProps(p)}>
               <img
                 ref={(el) => {
-                  if (el) spinTargets.current.set(p.id, { el, spinDur: layout.spinDur });
+                  if (el) spinTargets.current.set(p.id, { el, spinDur });
                   else spinTargets.current.delete(p.id);
                 }}
                 className="c5-body__img"
@@ -373,45 +348,8 @@ function BeltScene() {
               {renderCard(p)}
             </a>
 
-            {moons.map(({ project: m, layout: ml }) => (
-              <div
-                key={m.id}
-                className="c5-rotor"
-                ref={(rotor) => {
-                  if (!rotor) {
-                    orbitTargets.current.delete(m.id);
-                    return;
-                  }
-                  const inner = rotor.querySelector('.c5-rotor__seat');
-                  orbitTargets.current.set(m.id, {
-                    rotor,
-                    inner,
-                    orbitDur: ml.orbitDur,
-                    orbitPhase: ml.orbitPhase,
-                  });
-                }}
-              >
-                <div
-                  className="c5-rotor__seat"
-                  style={{ width: `${ml.sizeVw}vw`, height: `${ml.sizeVw}vw` }}
-                >
-                  <a {...sharedBodyProps(m, true)}>
-                    <img
-                      ref={(el) => {
-                        if (el) spinTargets.current.set(m.id, { el, spinDur: ml.spinDur });
-                        else spinTargets.current.delete(m.id);
-                      }}
-                      className="c5-body__img"
-                      src={resolveImage(m.imagePath)}
-                      alt=""
-                      loading="lazy"
-                      draggable="false"
-                    />
-                    {renderCard(m)}
-                  </a>
-                </div>
-              </div>
-            ))}
+            {/* Wix-style Connector Line and Label */}
+            {renderConnectorAndLabel(p.id)}
           </div>
         ))}
       </div>
