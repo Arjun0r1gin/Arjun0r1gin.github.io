@@ -2,6 +2,7 @@ import { AnimationProvider } from './providers/AnimationProvider';
 import Chapter1Initialize from './components/chapters/Chapter1Initialize';
 import Chapter3Operator from './components/chapters/Chapter3Operator';
 import Chapter4Assembly from './components/chapters/Chapter4Assembly';
+import Chapter7Transmission from './components/chapters/Chapter7Transmission';
 
 function App() {
   return (
@@ -35,6 +36,9 @@ function App() {
       <div style={{ width: '100%' }}>
         <Chapter4Assembly />
       </div>
+
+      {/* Chapter 7: Encrypted Transmission — intentionally quiet */}
+      <Chapter7Transmission />
     </AnimationProvider>
   );
 }
