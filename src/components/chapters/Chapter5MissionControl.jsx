@@ -205,8 +205,8 @@ function BeltScene() {
     },
   });
 
-  const renderCard = (p) => (
-    <span className="c5-card" aria-hidden="true">
+  const renderCard = (p, yOffVh) => (
+    <span className={`c5-card${yOffVh < 0 ? ' c5-card--below' : ''}`} aria-hidden="true">
       <span className="c5-card__name">{p.name}</span>
       <span className="c5-card__blurb">{p.blurb}</span>
     </span>
@@ -390,7 +390,7 @@ function BeltScene() {
                 loading="lazy"
                 draggable="false"
               />
-              {renderCard(p)}
+              {renderCard(p, yOffVh)}
             </a>
 
             {/* Wix-style Connector Line and Label */}

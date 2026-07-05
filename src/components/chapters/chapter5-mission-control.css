@@ -257,6 +257,11 @@
   top: calc(100% + 14px);
 }
 
+.c5-card--below {
+  bottom: auto !important;
+  top: calc(100% + 14px) !important;
+}
+
 /* ---------- wix-style connector lines ---------- */
 .c5-connector-svg {
   position: absolute;
