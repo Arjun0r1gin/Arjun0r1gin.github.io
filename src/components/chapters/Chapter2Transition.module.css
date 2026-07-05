@@ -1,0 +1,165 @@
+/*
+ * Chapter 2: Transition Protocol — co-located CSS module.
+ *
+ * This chapter transitions the universe from deep-space black → full
+ * whiteout → converging word reveal → merge phrase → hand-off to Ch.3.
+ *
+ * Layout only. All motion is GSAP-driven (transform / opacity only).
+ * No tokens.css modifications.
+ */
+
+/* ============================================================
+   PINNED SECTION SHELL
+   ============================================================ */
+
+.section {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  /* Start opaque black; GSAP drives to white during whiteout stage */
+  background: var(--void-0, #030308);
+}
+
+/* ============================================================
+   CLOUD LAYERS  (near / mid / far)
+   Each absolutely covers the viewport. GSAP drives opacity + drift.
+   ============================================================ */
+
+.cloudLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-size: cover;
+  /* Start invisible — GSAP reveals during stage 1 */
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.cloudFar {
+  /* Placeholder: very faint grey gradient representing distant cloud */
+  background:
+    radial-gradient(ellipse 120% 60% at 50% 90%,
+      rgba(210, 218, 230, 0.18) 0%,
+      transparent 70%);
+}
+
+.cloudMid {
+  background:
+    radial-gradient(ellipse 140% 55% at 50% 85%,
+      rgba(230, 235, 245, 0.22) 0%,
+      transparent 65%),
+    radial-gradient(ellipse 80% 35% at 20% 95%,
+      rgba(215, 220, 235, 0.14) 0%,
+      transparent 60%);
+}
+
+.cloudNear {
+  background:
+    radial-gradient(ellipse 160% 50% at 50% 100%,
+      rgba(245, 248, 252, 0.35) 0%,
+      transparent 60%),
+    radial-gradient(ellipse 90% 40% at 80% 100%,
+      rgba(240, 244, 250, 0.20) 0%,
+      transparent 55%);
+}
+
+/* ============================================================
+   STAGE CONTENT  (centered flex column)
+   ============================================================ */
+
+.stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* ============================================================
+   TERMINAL OVERLAY  (stage 3 — dark text on white bg)
+   ============================================================ */
+
+.terminal {
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  opacity: 0;        /* GSAP reveals */
+  z-index: 10;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   WORD SLOTS  (stage 3)
+   Three words that converge from off-screen.
+   ============================================================ */
+
+.words {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  opacity: 0;        /* parent opacity; GSAP reveals group then fades */
+}
+
+.wordSlot {
+  font-family: var(--font-display, 'Inter', system-ui, sans-serif);
+  font-size: clamp(36px, 7vw, 96px);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: #0b0e1c;    /* dark text on white bg */
+  line-height: 1;
+  /* GSAP sets translateX individually per slot before animating to 0 */
+  will-change: transform, opacity;
+}
+
+/* ============================================================
+   MERGED PHRASE  (stage 4)
+   ============================================================ */
+
+.mergedPhrase {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display, 'Inter', system-ui, sans-serif);
+  font-size: clamp(28px, 5vw, 72px);
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  color: #0b0e1c;
+  opacity: 0;        /* GSAP reveals then fades to black */
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* ============================================================
+   CURSOR KEYFRAME  (used by TerminalText component)
+   ============================================================ */
+
+@keyframes terminalBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ============================================================
+   REDUCED MOTION  — everything shown in final composed state
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .cloudLayer {
+    opacity: 0.25 !important;
+  }
+  .terminal,
+  .words,
+  .wordSlot {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
