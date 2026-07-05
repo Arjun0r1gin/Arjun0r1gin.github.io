@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
+import { useAnimationReady } from './useAnimationReady';
 
 interface PinnedTimelineOptions {
   start?: string;
@@ -21,8 +22,10 @@ export const usePinnedTimeline = (
 ) => {
   const [timeline, setTimeline] = useState<gsap.core.Timeline | null>(null);
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
+  const isReady = useAnimationReady();
 
   useEffect(() => {
+    if (!isReady) return;
     const element = ref.current;
     if (!element) return;
 
@@ -51,7 +54,7 @@ export const usePinnedTimeline = (
         setTimeline(null);
       }
     };
-  }, [ref, options.start, options.end]);
+  }, [ref, options.start, options.end, isReady]);
 
   return timeline;
 };

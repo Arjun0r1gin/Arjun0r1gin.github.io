@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useAnimationStore } from '../engine/animationStore';
+import { useAnimationReady } from './useAnimationReady';
 
 interface SectionProgressOptions {
   start?: string;
@@ -22,7 +23,10 @@ export const useSectionProgress = (
 ) => {
   const [progress, setProgress] = useState(0);
 
+  const isReady = useAnimationReady();
+
   useEffect(() => {
+    if (!isReady) return;
     const element = ref.current;
     if (!element) return;
 
@@ -50,7 +54,7 @@ export const useSectionProgress = (
     return () => {
       trigger.kill();
     };
-  }, [ref, sectionId, options.start, options.end]);
+  }, [ref, sectionId, options.start, options.end, isReady]);
 
   return progress;
 };

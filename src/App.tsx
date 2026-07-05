@@ -32,7 +32,9 @@ function App() {
       <Chapter3Operator />
 
       {/* Chapter 4: pinned rocket assembly */}
-      <Chapter4Assembly />
+      <div style={{ width: '100%' }}>
+        <Chapter4Assembly />
+      </div>
     </AnimationProvider>
   );
 }

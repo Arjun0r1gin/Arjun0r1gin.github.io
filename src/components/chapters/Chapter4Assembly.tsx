@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useAnimationReady } from '../../animations/hooks/useAnimationReady';
 import styles from './Chapter4Assembly.module.css';
 
 import coreEngine from '../../assets/rocket/core-engine.png';
@@ -68,6 +69,7 @@ const SEGMENTS: Array<{ parts: string[]; start: number; end: number; from: numbe
 ];
 
 export default function Chapter4Assembly() {
+  const isReady = useAnimationReady();
   const sectionRef = useRef<HTMLElement>(null);
   const rocketRef = useRef<HTMLDivElement>(null);      // outer group: scrubbed exit transform + glow filter
   const rocketInnerRef = useRef<HTMLDivElement>(null); // inner group: transient vibration jitter only
@@ -80,6 +82,7 @@ export default function Chapter4Assembly() {
   const [rmStage, setRmStage] = useState(0);
 
   useLayoutEffect(() => {
+    if (!isReady) return;
     const section = sectionRef.current;
     const rocket = rocketRef.current;
     const inner = rocketInnerRef.current;
@@ -248,7 +251,7 @@ export default function Chapter4Assembly() {
     // Revert kills the timeline, its ScrollTrigger/pin, and all gsap.set
     // inline styles if the component unmounts mid-scroll.
     return () => ctx.revert();
-  }, []);
+  }, [isReady]);
 
   return (
     <section ref={sectionRef} className={styles.section} aria-label="Chapter 4: Rocket assembly">
