@@ -1,0 +1,373 @@
+/* ==================================================================
+   Chapter 5 — Mission Control (horizontal-scroll planetary belt)
+   All motion is transform/opacity only. Layout tokens from tokens.css.
+   ================================================================== */
+
+/* ---------- pinned scene ---------- */
+.c5 {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--void-0);
+  contain: layout style;
+}
+
+/* ---------- distant blueprint grid (parallax backdrop) ---------- */
+.c5-grid {
+  position: absolute;
+  inset: 0 auto 0 0;
+  height: 100%;
+  will-change: transform;
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--signal-teal) 7%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--signal-teal) 7%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 72px 72px;
+}
+
+/* ---------- light-year distance readout ruler ---------- */
+.c5-ruler {
+  position: absolute;
+  top: 4vh;
+  left: 0;
+  display: flex;
+  align-items: flex-start;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.c5-ruler__tick {
+  flex: 0 0 4vw;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: var(--font-terminal);
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--signal-teal);
+  opacity: 0.35;
+  white-space: nowrap;
+}
+
+.c5-ruler__tick i {
+  display: block;
+  width: 1px;
+  height: 10px;
+  background: var(--signal-teal);
+}
+
+/* every 5th tick reads slightly stronger, like a measured instrument */
+.c5-ruler__tick:nth-child(5n + 1) {
+  opacity: 0.6;
+}
+.c5-ruler__tick:nth-child(5n + 1) i {
+  height: 16px;
+}
+
+/* ---------- corner radar rings (ambient chrome, not track-bound) ---------- */
+.c5-radar {
+  position: absolute;
+  right: 3vw;
+  bottom: 5vh;
+  width: 120px;
+  height: 120px;
+  pointer-events: none;
+}
+
+.c5-radar i {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--signal-teal);
+  border-radius: 50%;
+  opacity: 0.18;
+}
+.c5-radar i:nth-child(2) {
+  inset: 22%;
+  opacity: 0.28;
+}
+.c5-radar i:nth-child(3) {
+  inset: 44%;
+  opacity: 0.38;
+  border-style: dashed;
+}
+
+/* ---------- the horizontal track ---------- */
+.c5-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  will-change: transform;
+}
+
+/* ---------- word callouts: word + leader line + glowing dot ---------- */
+.c5-word {
+  position: absolute;
+  top: 14vh;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2.4vw, 40px);
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--ink-0);
+  text-shadow: 0 0 18px color-mix(in srgb, var(--signal-teal) 45%, transparent);
+  pointer-events: none;
+  visibility: hidden; /* gsap autoAlpha takes over */
+}
+
+.c5-word__line {
+  display: block;
+  width: 1px;
+  height: 9vh;
+  margin-top: 10px;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--signal-teal) 70%, transparent),
+    transparent
+  );
+}
+
+.c5-word__dot {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--signal-teal);
+  box-shadow: 0 0 10px 2px
+    color-mix(in srgb, var(--signal-teal) 70%, transparent);
+}
+
+/* ---------- planet slots ---------- */
+.c5-slot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+/* the focusable body itself (planet or moon) */
+.c5-body {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: 50%;
+  cursor: pointer;
+  outline: none;
+  /* glow driven by each body's own accent token */
+  box-shadow: 0 0 30px -6px color-mix(in srgb, var(--accent) 30%, transparent);
+  transition:
+    transform 150ms var(--ease-cosmic),
+    box-shadow 150ms var(--ease-cosmic),
+    opacity 150ms var(--ease-cosmic);
+}
+
+.c5-body--moon {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  height: 100%;
+}
+
+.c5-body__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  user-select: none;
+  will-change: transform;
+}
+
+/* hover / focus: intensify glow, slight scale-up */
+.c5-body:hover,
+.c5-body:focus-visible {
+  transform: scale(1.05);
+  box-shadow:
+    0 0 46px -2px color-mix(in srgb, var(--accent) 65%, transparent),
+    0 0 90px -10px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.c5-body:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 6px;
+}
+
+/* while one body is active, the others dim slightly for visual focus */
+.c5--has-active .c5-body:not(.is-active) {
+  opacity: 0.85;
+}
+
+/* ---------- info card (name + blurb) ---------- */
+.c5-card {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 14px);
+  transform: translateX(-50%) scale(0.94);
+  width: max-content;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  background: color-mix(in srgb, var(--void-0) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  border-radius: 4px;
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 150ms var(--ease-cosmic),
+    transform 150ms var(--ease-cosmic);
+}
+
+.c5-body:hover .c5-card,
+.c5-body:focus-visible .c5-card {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+.c5-card__name {
+  font-family: var(--font-terminal);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--accent);
+}
+
+.c5-card__blurb {
+  font-family: var(--font-terminal);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-1);
+  white-space: normal;
+}
+
+/* moons sit low — flip their card below so it stays on screen */
+.c5-body--moon .c5-card {
+  bottom: auto;
+  top: calc(100% + 14px);
+}
+
+/* ---------- moon orbit rotor ---------- */
+.c5-rotor {
+  position: absolute;
+  /* orbit path extends past the parent's rim */
+  inset: -18%;
+  border-radius: 50%;
+  border: 1px dashed color-mix(in srgb, var(--signal-teal) 14%, transparent);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.c5-rotor__seat {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  will-change: transform;
+}
+
+/* ==================================================================
+   FALLBACK — stacked card list (<768px or prefers-reduced-motion)
+   ================================================================== */
+.c5f {
+  background: var(--void-0);
+  padding: 12vh 6vw;
+}
+
+.c5f-title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 6vw, 44px);
+  font-weight: 700;
+  letter-spacing: 6px;
+  color: var(--ink-0);
+  margin: 0 0 40px;
+  text-align: left;
+}
+
+.c5f-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 640px;
+}
+
+.c5f-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--void-0) 80%, transparent);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 600ms var(--ease-cosmic);
+}
+
+.c5f-card.is-visible,
+.c5f--static .c5f-card {
+  opacity: 1;
+}
+
+.c5f-card:hover,
+.c5f-card:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 24px -8px color-mix(in srgb, var(--accent) 60%, transparent);
+  outline: none;
+}
+
+.c5f-card__img {
+  flex: 0 0 64px;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.c5f-card__text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.c5f-card__name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-family: var(--font-terminal);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--accent);
+}
+
+.c5f-card__tag {
+  font-size: 9px;
+  letter-spacing: 1px;
+  padding: 2px 6px;
+  border: 1px solid color-mix(in srgb, var(--ink-1) 50%, transparent);
+  border-radius: 3px;
+  color: var(--ink-1);
+}
+
+.c5f-card__blurb {
+  font-family: var(--font-terminal);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-1);
+}

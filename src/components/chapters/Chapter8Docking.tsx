@@ -60,50 +60,52 @@ export const Chapter8Docking: React.FC = () => {
       return;
     }
 
-    // ScrollTrigger to fade in the elements when section is mostly in view
-    const trigger = ScrollTrigger.create({
-      trigger: section,
-      start: 'top 55%',
-      once: true,
-      onEnter: () => {
-        const tl = gsap.timeline();
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ paused: true });
 
-        // Staggered reveal of header and sub
-        tl.to(heading, {
+      // Staggered reveal of header and sub
+      tl.to(heading, {
+        opacity: 1,
+        y: 0,
+        duration: 0.9,
+        ease: 'power3.out',
+      });
+
+      tl.to(
+        subTitle,
+        {
+          opacity: 0.75,
+          duration: 0.6,
+          ease: 'power2.out',
+        },
+        '>-0.4'
+      );
+
+      // Stagger in links
+      tl.fromTo(
+        grid.children,
+        { opacity: 0, y: 15 },
+        {
           opacity: 1,
           y: 0,
-          duration: 0.9,
+          duration: 0.7,
+          stagger: 0.12,
           ease: 'power3.out',
-        });
+        },
+        '>-0.2'
+      );
 
-        tl.to(
-          subTitle,
-          {
-            opacity: 0.75,
-            duration: 0.6,
-            ease: 'power2.out',
-          },
-          '>-0.4'
-        );
-
-        // Stagger in links
-        tl.fromTo(
-          grid.children,
-          { opacity: 0, y: 15 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.7,
-            stagger: 0.12,
-            ease: 'power3.out',
-          },
-          '>-0.2'
-        );
-      },
-    });
+      // ScrollTrigger to fade in the elements when section is mostly in view
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top 55%',
+        once: true,
+        onEnter: () => tl.play(),
+      });
+    }, section);
 
     return () => {
-      trigger.kill();
+      ctx.revert();
     };
   }, [isReady, prefersReduced]);
 

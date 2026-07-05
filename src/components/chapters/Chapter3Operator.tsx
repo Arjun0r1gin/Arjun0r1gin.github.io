@@ -57,73 +57,71 @@ export const Chapter3Operator: React.FC = () => {
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
-    const terminal = terminalRef.current;
-    const line1 = terminalLine1Ref.current;
-    const line2 = terminalLine2Ref.current;
-    const content = contentRef.current;
-    const heading = headingRef.current;
-    const grid = gridRef.current;
-
-    if (!section || !terminal || !line1 || !line2 || !content || !heading || !grid) return;
+    if (!section) return;
 
     if (prefersReduced) {
       setIntroComplete(true);
       return;
     }
 
-    const letters = heading.querySelectorAll(`.${styles.letter}`);
+    const ctx = gsap.context(() => {
+      const letters = headingRef.current?.querySelectorAll(`.${styles.letter}`);
+      const terminal = terminalRef.current;
+      const line1 = terminalLine1Ref.current;
+      const line2 = terminalLine2Ref.current;
+      const content = contentRef.current;
+      const heading = headingRef.current;
+      const grid = gridRef.current;
 
-    // Create a ScrollTrigger that fires ONCE when the section enters 50% viewport height
-    const introTrigger = ScrollTrigger.create({
-      trigger: section,
-      start: 'top 50%',
-      once: true,
-      onEnter: () => {
-        const tl = gsap.timeline({
-          onComplete: () => {
-            setIntroComplete(true);
-          },
-        });
+      if (!terminal || !line1 || !line2 || !content || !heading || !grid) return;
 
-        // 1. Loading Text typing effect
-        const text1 = 'LOADING OPERATOR DATA...';
-        const text2 = 'ACCESS GRANTED';
+      const tl = gsap.timeline({
+        paused: true,
+        onComplete: () => {
+          setIntroComplete(true);
+        },
+      });
 
+      // 1. Loading Text typing effect
+      const text1 = 'LOADING OPERATOR DATA...';
+      const text2 = 'ACCESS GRANTED';
+
+      tl.call(() => {
+        if (line1) line1.textContent = '';
+        if (line2) line2.textContent = '';
+      });
+
+      // Type line 1
+      text1.split('').forEach((char, index) => {
         tl.call(() => {
-          if (line1) line1.textContent = '';
-          if (line2) line2.textContent = '';
-        });
+          if (line1) line1.textContent += char;
+        }, undefined, index * 0.04);
+      });
 
-        // Type line 1
-        text1.split('').forEach((char, index) => {
-          tl.call(() => {
-            if (line1) line1.textContent += char;
-          }, undefined, index * 0.04);
-        });
+      // Delay and type line 2
+      const line2Start = text1.length * 0.04 + 0.4;
+      text2.split('').forEach((char, index) => {
+        tl.call(() => {
+          if (line2) line2.textContent += char;
+        }, undefined, line2Start + index * 0.05);
+      });
 
-        // Delay and type line 2
-        const line2Start = text1.length * 0.04 + 0.4;
-        text2.split('').forEach((char, index) => {
-          tl.call(() => {
-            if (line2) line2.textContent += char;
-          }, undefined, line2Start + index * 0.05);
-        });
+      // Wait and fade out terminal intro
+      const fadeStart = line2Start + text2.length * 0.05 + 0.8;
+      tl.to(terminal, {
+        opacity: 0,
+        duration: 0.5,
+        ease: 'power2.inOut',
+      }, fadeStart);
 
-        // Wait and fade out terminal intro
-        const fadeStart = line2Start + text2.length * 0.05 + 0.8;
-        tl.to(terminal, {
-          opacity: 0,
-          duration: 0.5,
-          ease: 'power2.inOut',
-        }, fadeStart);
+      // 2. Reveal main content container
+      tl.to(content, {
+        opacity: 1,
+        duration: 0.1,
+      }, fadeStart + 0.4);
 
-        // 2. Reveal main content container
-        tl.to(content, {
-          opacity: 1,
-          duration: 0.1,
-        }, fadeStart + 0.4);
-
-        // 3. Heading letter assembly
+      // 3. Heading letter assembly
+      if (letters) {
         tl.to(letters, {
           opacity: 1,
           y: 0,
@@ -131,49 +129,55 @@ export const Chapter3Operator: React.FC = () => {
           stagger: 0.03,
           ease: 'power3.out',
         }, fadeStart + 0.5);
+      }
 
-        // 4. Heading drift to top-left of its container
-        tl.to(heading, {
-          left: 0,
-          x: 0,
-          transform: 'none',
-          duration: 0.8,
-          ease: 'var(--ease-cosmic, power4.out)',
-        }, `>+0.2`);
-      },
-    });
+      // 4. Heading drift to top-left of its container
+      tl.to(heading, {
+        left: 0,
+        x: 0,
+        transform: 'none',
+        duration: 0.8,
+        ease: 'var(--ease-cosmic, power4.out)',
+      }, `>+0.2`);
 
-    // Create a ScrollTrigger specifically for the cards grid reveal
-    const gridTrigger = ScrollTrigger.create({
-      trigger: grid,
-      start: 'top 75%',
-      once: true,
-      onEnter: () => {
-        // Wait until intro / assembly completes if they happen close to each other
-        gsap.to(grid, {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          ease: 'power3.out',
-        });
+      // Create a ScrollTrigger that fires ONCE when the section enters 50% viewport height
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top 50%',
+        once: true,
+        onEnter: () => tl.play(),
+      });
 
-        gsap.fromTo(
-          grid.children,
-          { opacity: 0, y: 12 },
-          {
+      // Create a ScrollTrigger specifically for the cards grid reveal
+      ScrollTrigger.create({
+        trigger: grid,
+        start: 'top 75%',
+        once: true,
+        onEnter: () => {
+          gsap.to(grid, {
             opacity: 1,
             y: 0,
-            duration: 0.6,
-            stagger: 0.08,
-            ease: 'power2.out',
-          }
-        );
-      },
-    });
+            duration: 0.8,
+            ease: 'power3.out',
+          });
+
+          gsap.fromTo(
+            grid.children,
+            { opacity: 0, y: 12 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.6,
+              stagger: 0.08,
+              ease: 'power2.out',
+            }
+          );
+        },
+      });
+    }, section);
 
     return () => {
-      introTrigger.kill();
-      gridTrigger.kill();
+      ctx.revert();
     };
   }, [prefersReduced]);
 
