@@ -2,7 +2,7 @@ import { AnimationProvider } from './providers/AnimationProvider';
 import Chapter1Initialize from './components/chapters/Chapter1Initialize';
 import Chapter2Transition from './components/chapters/Chapter2Transition';
 import Chapter3Operator from './components/chapters/Chapter3Operator';
-import Chapter4Assembly from './components/chapters/Chapter4Assembly';
+import Chapter5MissionControl from './components/chapters/Chapter5MissionControl';
 import Chapter6LogsArchive from './components/chapters/Chapter6LogsArchive';
 import Chapter7Transmission from './components/chapters/Chapter7Transmission';
 import Chapter8Docking from './components/chapters/Chapter8Docking';
@@ -21,9 +21,9 @@ function App() {
       {/* Chapter 3: Operator Profile */}
       <Chapter3Operator />
 
-      {/* Chapter 4: pinned rocket assembly */}
+      {/* Chapter 5: pinned horizontal-scroll planetary belt */}
       <div style={{ width: '100%' }}>
-        <Chapter4Assembly />
+        <Chapter5MissionControl />
       </div>
 
       {/* Chapter 6: Logs Archive — parallax asteroid field */}
