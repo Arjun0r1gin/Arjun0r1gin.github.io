@@ -99,6 +99,11 @@
   color: var(--ink-0, #e8e9ef);
 }
 
+.linkItem:focus-visible {
+  outline: 2px solid var(--signal-teal, #8fd8d2);
+  outline-offset: 4px;
+}
+
 /* Engine Light indicator */
 .engineIndicator {
   display: flex;

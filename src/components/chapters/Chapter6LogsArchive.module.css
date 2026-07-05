@@ -114,6 +114,11 @@
   filter: brightness(1.35);
 }
 
+.asteroid:focus-visible {
+  outline: 2px solid var(--signal-teal, #8fd8d2);
+  outline-offset: 4px;
+}
+
 /* ============================================================
    HOVER PREVIEW TOOLTIP
    ============================================================ */
@@ -253,6 +258,11 @@
   border-color: var(--signal-teal, #8fd8d2);
   color: var(--signal-teal, #8fd8d2);
   outline: none;
+}
+
+.closeBtn:focus-visible {
+  outline: 2px solid var(--signal-teal, #8fd8d2);
+  outline-offset: 2px;
 }
 
 /* ============================================================
