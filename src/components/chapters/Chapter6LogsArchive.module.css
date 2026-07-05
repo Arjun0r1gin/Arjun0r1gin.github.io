@@ -1,0 +1,272 @@
+/*
+ * Chapter 6: Logs Archive — co-located CSS module.
+ *
+ * Visual language: asteroid field / deep space.
+ * Asteroid shapes are irregular divs using clip-path until real PNGs arrive.
+ * All parallax motion is GSAP-driven; only static layout, shapes, and
+ * hover/modal transitions live here.
+ *
+ * No tokens.css modifications.
+ */
+
+/* ============================================================
+   SECTION SHELL
+   ============================================================ */
+
+.section {
+  position: relative;
+  /* Taller than 100vh to give parallax layers room to breathe */
+  min-height: 200vh;
+  width: 100%;
+  background: var(--void-0, #030308);
+  overflow: hidden;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  padding: 40px 48px 20px;
+  pointer-events: none;
+}
+
+.chapterLabel {
+  font-family: var(--font-terminal, ui-monospace, 'Courier New', monospace);
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--ink-1, #a9adb8);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  opacity: 0.6;
+}
+
+.title {
+  font-family: var(--font-display, 'Inter', system-ui, sans-serif);
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 300;
+  letter-spacing: 3px;
+  color: var(--ink-0, #e8e9ef);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* ============================================================
+   PARALLAX LAYERS
+   ============================================================ */
+
+.layerContainer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  /* GSAP drives translateY per layer */
+  will-change: transform;
+  pointer-events: auto;   /* re-enable so asteroids receive events */
+}
+
+/* ============================================================
+   ASTEROID
+   ============================================================ */
+
+.asteroid {
+  position: absolute;
+  cursor: pointer;
+  /* Default clip-path polygon — irregular rocky silhouette */
+  clip-path: polygon(
+    25% 0%,
+    75% 5%,
+    100% 30%,
+    90% 70%,
+    65% 100%,
+    20% 95%,
+    0% 60%,
+    5% 20%
+  );
+  background: linear-gradient(
+    135deg,
+    rgba(90, 100, 115, 0.85) 0%,
+    rgba(55, 62, 75, 0.9) 50%,
+    rgba(35, 40, 50, 0.95) 100%
+  );
+  transition:
+    box-shadow 200ms ease,
+    filter 200ms ease;
+  outline: none;
+}
+
+/* Size variants */
+.small  { width: 48px;  height: 44px; }
+.medium { width: 72px;  height: 66px; }
+.large  { width: 100px; height: 92px; }
+
+/* Hover/focus glow — engine-lights feel */
+.asteroid:hover,
+.asteroid:focus-visible {
+  box-shadow: 0 0 18px 4px rgba(143, 216, 210, 0.35);
+  filter: brightness(1.35);
+}
+
+/* ============================================================
+   HOVER PREVIEW TOOLTIP
+   ============================================================ */
+
+.preview {
+  position: absolute;
+  /* Positioned via JS inline style relative to the asteroid */
+  z-index: 50;
+  background: rgba(3, 3, 8, 0.92);
+  border: 1px solid rgba(143, 216, 210, 0.25);
+  border-radius: 4px;
+  padding: 10px 14px;
+  pointer-events: none;
+  white-space: nowrap;
+  backdrop-filter: blur(6px);
+  /* Hidden by default, shown on asteroid hover via sibling/parent */
+}
+
+.previewTitle {
+  font-family: var(--font-terminal, ui-monospace, 'Courier New', monospace);
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--signal-teal, #8fd8d2);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+/* ============================================================
+   MODAL BACKDROP + PANEL
+   ============================================================ */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 3, 8, 0.82);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Fade in/out via GSAP opacity */
+  opacity: 0;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+}
+
+.backdropOpen {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.panel {
+  position: relative;
+  background: rgba(8, 10, 18, 0.96);
+  border: 1px solid rgba(143, 216, 210, 0.20);
+  border-radius: 6px;
+  padding: 36px 40px;
+  max-width: 560px;
+  width: calc(100% - 48px);
+  /* Start scaled down; GSAP animates to 1 */
+  transform: scale(0.92);
+  transition:
+    transform 250ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 200ms ease;
+}
+
+.backdropOpen .panel {
+  transform: scale(1);
+}
+
+/* Corner accent */
+.panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-top: 1px solid var(--signal-teal, #8fd8d2);
+  border-left: 1px solid var(--signal-teal, #8fd8d2);
+  opacity: 0.6;
+}
+
+.panelMeta {
+  font-family: var(--font-terminal, ui-monospace, 'Courier New', monospace);
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--signal-teal, #8fd8d2);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.panelMetaDivider {
+  display: inline-block;
+  width: 1px;
+  height: 10px;
+  background: rgba(143, 216, 210, 0.3);
+}
+
+.panelTitle {
+  font-family: var(--font-display, 'Inter', system-ui, sans-serif);
+  font-size: clamp(20px, 3vw, 28px);
+  font-weight: 300;
+  letter-spacing: 1px;
+  color: var(--ink-0, #e8e9ef);
+  margin: 0 0 20px;
+}
+
+.panelBody {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink-1, #a9adb8);
+  margin: 0;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: 1px solid rgba(143, 216, 210, 0.2);
+  border-radius: 3px;
+  color: var(--ink-1, #a9adb8);
+  font-family: var(--font-terminal, ui-monospace, 'Courier New', monospace);
+  font-size: 11px;
+  letter-spacing: 2px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease;
+}
+
+.closeBtn:hover,
+.closeBtn:focus-visible {
+  border-color: var(--signal-teal, #8fd8d2);
+  color: var(--signal-teal, #8fd8d2);
+  outline: none;
+}
+
+/* ============================================================
+   REDUCED MOTION OVERRIDES
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .layer {
+    /* Parallax transform disabled — layers sit at natural position */
+    transform: none !important;
+    will-change: auto;
+  }
+  .backdrop,
+  .panel {
+    transition: none !important;
+  }
+}
