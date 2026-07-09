@@ -32,15 +32,13 @@ export const AnimationProvider: React.FC<AnimationProviderProps> = ({ children }
   const store = useAnimationStore();
 
   useEffect(() => {
-    // 1. Initialize Lenis for smooth scrolling
     const lenis = new Lenis({
-      duration: 0.3,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      lerp: 0.08,             // Buttery smooth physics-based inertia
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
-      wheelMultiplier: 1.8,   // ↑ increased from 1.2 for immediate faster response
-      touchMultiplier: 1.8,   // ↑ increased from 1.2 for faster touch/trackpad response
+      wheelMultiplier: 1.0,   // Standard wheel sensitivity
+      touchMultiplier: 1.0,   // Standard touch/trackpad sensitivity
     });
 
     lenisRef.current = lenis;
