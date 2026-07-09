@@ -15,6 +15,7 @@ export interface DevLog {
   summary: string;
   size: 'small' | 'medium' | 'large';
   url: string;
+  project?: string;
 }
 
 export const devlogs: DevLog[] = [
@@ -29,6 +30,7 @@ export const devlogs: DevLog[] = [
       'patterns could expose injection attempts.',
     size: 'large',
     url: 'https://github.com/Arjun0r1gin/RAKSHASTRA',
+    project: 'RAKSHASTRA',
   },
   {
     id: 'rakshastra-v2',
@@ -41,6 +43,7 @@ export const devlogs: DevLog[] = [
       'public TLE feeds returned 94% precision on synthetic injections.',
     size: 'large',
     url: 'https://github.com/Arjun0r1gin/RAKSHASTRA',
+    project: 'RAKSHASTRA',
   },
   {
     id: 'rakshastra-v3',
@@ -53,6 +56,7 @@ export const devlogs: DevLog[] = [
       'submitted for internal review.',
     size: 'large',
     url: 'https://github.com/Arjun0r1gin/RAKSHASTRA',
+    project: 'RAKSHASTRA',
   },
   {
     id: 'ep-sat-design',
@@ -64,6 +68,7 @@ export const devlogs: DevLog[] = [
       'draft of the interface control document. Telemetry packet format locked.',
     size: 'medium',
     url: 'https://github.com/Arjun0r1gin/EP-SAT',
+    project: 'EP-SAT',
   },
   {
     id: 'ep-sat-pdr',
@@ -75,6 +80,7 @@ export const devlogs: DevLog[] = [
       'simulation at ±2° accuracy. Launch campaign timeline set.',
     size: 'medium',
     url: 'https://github.com/Arjun0r1gin/EP-SAT',
+    project: 'EP-SAT',
   },
   {
     id: 'powerhouse-tech',
@@ -87,6 +93,7 @@ export const devlogs: DevLog[] = [
       'across the team.',
     size: 'small',
     url: 'https://github.com/Arjun0r1gin',
+    project: 'POWERHOUSE',
   },
 ];
 

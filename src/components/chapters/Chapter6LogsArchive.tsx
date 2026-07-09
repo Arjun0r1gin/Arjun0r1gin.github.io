@@ -181,7 +181,7 @@ function Asteroid({ placement, globalIndex, onClick }: AsteroidProps) {
           pointerEvents: 'none',
         }}
       >
-        {log.title}
+        {log.project || log.title}
       </div>
 
       {/* Hover preview — TerminalText scramble */}

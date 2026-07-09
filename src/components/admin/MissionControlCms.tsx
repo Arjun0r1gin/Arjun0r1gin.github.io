@@ -1038,6 +1038,16 @@ export const MissionControlCms: React.FC<{ onClose: () => void }> = ({ onClose }
                         </div>
                       </div>
 
+                      <div className={styles.inputGroup}>
+                        <label>PROJECT_NAME (SHOWN BELOW ASTEROID)</label>
+                        <input
+                          type="text"
+                          value={logForm.project || ''}
+                          onChange={(e) => setLogForm({ ...logForm, project: e.target.value })}
+                          placeholder="e.g. RAKSHASTRA"
+                        />
+                      </div>
+
                       <div className={styles.inputGroupRow}>
                         <div className={styles.inputGroup}>
                           <label>DATE_STAMP (YYYY-MM)</label>
