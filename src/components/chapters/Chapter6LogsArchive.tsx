@@ -174,16 +174,11 @@ function Asteroid({ placement, globalIndex, onClick }: AsteroidProps) {
           fontSize: '9px',
           fontWeight: 'bold',
           letterSpacing: '1px',
-          color: '#00ff00',
-          textShadow: '0 0 5px rgba(0, 255, 0, 0.8)',
+          color: '#ffffff',
+          textShadow: '0 2px 4px rgba(0, 0, 0, 0.8)',
           whiteSpace: 'nowrap',
           textTransform: 'uppercase',
           pointerEvents: 'none',
-          background: 'rgba(5, 5, 8, 0.85)',
-          border: '1px solid rgba(0, 255, 0, 0.35)',
-          borderRadius: '3px',
-          padding: '2px 6px',
-          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.6)',
         }}
       >
         {log.title}
