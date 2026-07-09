@@ -8,6 +8,9 @@ import { TimelineRegistry } from '../animations/engine/TimelineRegistry';
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
 
+// Configure ScrollTrigger mobile normalizations
+ScrollTrigger.config({ ignoreMobileResize: true });
+
 // Configure ScrollTrigger defaults
 ScrollTrigger.defaults({
   markers: false,
@@ -31,11 +34,13 @@ export const AnimationProvider: React.FC<AnimationProviderProps> = ({ children }
   useEffect(() => {
     // 1. Initialize Lenis for smooth scrolling
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: 0.3,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
+      wheelMultiplier: 1.8,   // ↑ increased from 1.2 for immediate faster response
+      touchMultiplier: 1.8,   // ↑ increased from 1.2 for faster touch/trackpad response
     });
 
     lenisRef.current = lenis;

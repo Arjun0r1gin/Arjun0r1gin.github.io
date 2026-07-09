@@ -1,332 +1,311 @@
-import { useLayoutEffect, useRef, useCallback } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useAnimationReady } from '../../animations/hooks/useAnimationReady';
+import { useReducedMotion } from '../../animations/hooks/useReducedMotion';
 import styles from './Chapter1Initialize.module.css';
+import astronautImg from '../../assets/ui/astronaut.png';
 
-/* ============================================================
-   TYPES
-   ============================================================ */
-
-interface StarDef {
-  id: number;
-  top: string;
-  left: string;
-  size: number;
-  opacity: number;
-}
-
-interface FragmentDef {
-  id: number;
-  label: string;
-  left: string;
-  bottom: string;
-  dur: string;
-  delay: string;
-  drift: string;
-}
-
-/* ============================================================
-   STATIC DATA — generated once at module level so the
-   component re-renders don't reshuffle positions
-   ============================================================ */
-
-/** Seeded pseudo-random: keeps positions stable across HMR. */
-function seeded(seed: number): () => number {
-  let s = seed;
-  return () => {
-    s = (s * 16807 + 0) % 2147483647;
-    return (s - 1) / 2147483646;
-  };
-}
-
-const rng = seeded(0x4f2a91);
-
-const STARS: StarDef[] = Array.from({ length: 55 }, (_, i) => ({
-  id: i,
-  top: `${(rng() * 90).toFixed(2)}%`,
-  left: `${(rng() * 100).toFixed(2)}%`,
-  size: parseFloat((0.8 + rng() * 1.8).toFixed(2)),
-  opacity: parseFloat((0.25 + rng() * 0.55).toFixed(2)),
-}));
-
-const FRAGMENTS: FragmentDef[] = [
-  { id: 0, label: '0x4F2A',   left: '22%',  bottom: '52%', dur: '7s',  delay: '0s',    drift: '10px'  },
-  { id: 1, label: 'SYN_ACK',  left: '68%',  bottom: '48%', dur: '8.5s',delay: '1.3s',  drift: '-12px' },
-  { id: 2, label: 'PKT::FF01',left: '38%',  bottom: '60%', dur: '6.5s',delay: '2.8s',  drift: '6px'   },
-];
-
-/* ============================================================
-   TERMINAL TEXT — types out line by line
-   ============================================================ */
-
-const TERMINAL_LINES = [
-  'SYSTEM STATUS',
-  'ONLINE',
-  'INITIALIZING COSMOS...',
-];
-
-/* ============================================================
-   COMPONENT
-   ============================================================ */
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Chapter1Initialize() {
-  /* ---- Refs ---- */
-  const sectionRef    = useRef<HTMLElement>(null);
-  const terminalRef   = useRef<HTMLDivElement>(null);
-  const terminalLines = useRef<(HTMLSpanElement | null)[]>([]);
-  const cursorRef     = useRef<HTMLSpanElement>(null);
-  const heroRef       = useRef<HTMLDivElement>(null);
-  const missionRef    = useRef<HTMLDivElement>(null);
-  const characterRef  = useRef<HTMLDivElement>(null);
-  const fragmentsRef  = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const contentWrapperRef = useRef<HTMLDivElement>(null);
+  const astronautWrapperRef = useRef<HTMLDivElement>(null);
+  const astronautRef = useRef<HTMLImageElement>(null);
+  const nebula1Ref = useRef<HTMLImageElement>(null);
+  const nebula3Ref = useRef<HTMLImageElement>(null);
+  const nebula2Ref = useRef<HTMLImageElement>(null);
+  const nebulaWhiteRef = useRef<HTMLImageElement>(null);
+  const nebula4Ref = useRef<HTMLImageElement>(null);
+  const heroContentRef = useRef<HTMLDivElement>(null);
 
-
-  /* ---- Ref-callback for per-line spans ---- */
-  const setLineRef = useCallback(
-    (i: number) => (el: HTMLSpanElement | null) => {
-      terminalLines.current[i] = el;
-    },
-    []
-  );
-
-  /* ============================================================
-     ANIMATION SETUP
-     ============================================================ */
+  const isReady = useAnimationReady();
+  const prefersReduced = useReducedMotion();
 
   useLayoutEffect(() => {
-    const section    = sectionRef.current;
-    const terminal   = terminalRef.current;
-    const hero       = heroRef.current;
-    const mission    = missionRef.current;
-    const character  = characterRef.current;
-    const fragments  = fragmentsRef.current;
+    if (!isReady) return;
 
-    if (!section || !terminal || !hero || !mission || !character || !fragments) return;
+    const section = sectionRef.current;
+    const contentWrapper = contentWrapperRef.current;
+    const astronautWrapper = astronautWrapperRef.current;
+    const astronaut = astronautRef.current;
+    const nebula1 = nebula1Ref.current;
+    const nebula3 = nebula3Ref.current;
+    const nebula2 = nebula2Ref.current;
+    const nebulaWhite = nebulaWhiteRef.current;
+    const nebula4 = nebula4Ref.current;
+    const heroContent = heroContentRef.current;
 
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (
+      !section ||
+      !contentWrapper ||
+      !astronautWrapper ||
+      !astronaut ||
+      !nebula1 ||
+      !nebula3 ||
+      !nebula2 ||
+      !nebulaWhite ||
+      !nebula4 ||
+      !heroContent
+    )
+      return;
 
-    /* ----------------------------------------------------------
-       REDUCED MOTION — skip all delays; show final composed state
-       immediately. CSS media query already handles opacity/transform
-       resets; we just ensure the terminal is hidden.
-       ---------------------------------------------------------- */
+    // ── Reduced motion: show settled state immediately ──────────────────────
     if (prefersReduced) {
-      // Terminal type-out skipped — hide it, rest already visible via CSS
-      gsap.set(terminal, { opacity: 0, display: 'none' });
-      // Code fragments: static low opacity (CSS handles via media query)
+      gsap.set([nebula2, nebulaWhite, nebula4], { opacity: 0.8, yPercent: 0, scale: 1 });
+      gsap.set(heroContent, { opacity: 1, y: 0 });
+      gsap.set(astronautWrapper, { opacity: 1, y: 0, rotation: 0 });
       return;
     }
 
-    /* ----------------------------------------------------------
-       FULL MOTION — orchestrated GSAP sequence
-       ---------------------------------------------------------- */
+    // Disable lag smoothing for ScrollTrigger alignment
+    gsap.ticker.lagSmoothing(0);
 
     const ctx = gsap.context(() => {
-
-      // --- Initial state ---
-      // hero, mission, character start at opacity:0 (CSS sets this).
-      // Cursor starts blinking immediately.
-      gsap.set(terminal, { opacity: 1 });
-      gsap.set(hero,      { opacity: 0, y: 20 });
-      gsap.set(mission,   { opacity: 0, y: 10 });
-      gsap.set(character, { opacity: 0 });
-
-      // Clear line text before typing starts
-      terminalLines.current.forEach((el) => {
-        if (el) el.textContent = '';
+      // 1. Infinite organic floating/bobbing animation for the astronaut
+      gsap.to(astronaut, {
+        y: 42,
+        x: 18,
+        rotation: 5,
+        duration: 5,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
       });
 
-      /* ---- Step 1: ~400ms initial void pause ---- */
-      const masterTl = gsap.timeline({ delay: 0.4 });
-
-      /* ---- Step 2: Type each terminal line ---- */
-      TERMINAL_LINES.forEach((line, lineIdx) => {
-        const lineEl = terminalLines.current[lineIdx];
-        if (!lineEl) return;
-
-        // Stagger each character in
-        const chars = line.split('');
-        let charDelay = 0;
-        const lineStart = lineIdx * 0.9; // offset between lines
-
-        chars.forEach((char, _charIdx) => {
-          masterTl.call(
-            () => {
-              if (lineEl) lineEl.textContent += char;
-            },
-            undefined,
-            lineStart + charDelay
-          );
-          charDelay += char === ' ' ? 0.055 : 0.062;
-        });
+      // 2. Set initial GSAP properties for the astronaut wrapper to prevent jumps
+      gsap.set(astronautWrapper, {
+        xPercent: -50,
+        yPercent: 0,
+        rotation: 0,
+        opacity: 1,
       });
 
-      /* ---- Hold ~800ms after typing completes ---- */
-      const typingDuration = TERMINAL_LINES.reduce((acc) => acc + 0.9, 0) + 0.8;
+      // Set cloud transform origin to bottom-center so they scale upward (like rising fog)
+      gsap.set([nebula2, nebulaWhite, nebula4], {
+        transformOrigin: '50% 100%',
+      });
 
-      /* ---- Fade out terminal (600ms) ---- */
-      masterTl.to(
-        terminal,
-        { opacity: 0, duration: 0.6, ease: 'power2.inOut' },
-        typingDuration
-      );
-
-      /* ---- Step 3: Name fades + slides up (900ms) ---- */
-      masterTl.to(
-        hero,
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.9,
-          ease: 'var(--ease-cosmic, cubic-bezier(0.16, 1, 0.3, 1))',
+      // 3. Global persistent background drift timeline
+      gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true,
         },
-        typingDuration + 0.3  // slight overlap with terminal fade-out
-      );
+      })
+      .to(nebula1, { scale: 1.8, yPercent: -120, xPercent: -30, rotation: 15, ease: 'none' }, 0)
+      .to(nebula3, { scale: 1.9, yPercent: -80, xPercent: -20, rotation: 10, ease: 'none' }, 0);
 
-      /* ---- Step 4: Mission label fades in (200ms after name) ---- */
-      masterTl.to(
-        mission,
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.7,
-          ease: 'power3.out',
+      // 4. Main pinned scroll-scrub timeline
+      const heroTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true,
+          pin: true,
+          pinSpacing: true,
+          invalidateOnRefresh: true,
         },
-        `>+0.2`  // 200ms after previous tween ends
-      );
+      });
 
-      /* ---- Step 5: Character fades in last ---- */
-      masterTl.to(
-        character,
-        {
-          opacity: 1,
-          duration: 0.9,
-          ease: 'power2.out',
-        },
-        `>+0.1`
-      );
+      const isMobile = window.innerWidth < 768;
+      const liftY = isMobile ? '-14vh' : -130;
+      const driftY = isMobile ? '-7vh' : -70;
+      const sinkY = isMobile ? '3vh' : 30;
 
-      /* ---- Code fragments: stagger-in after character appears ---- */
-      masterTl.fromTo(
-        Array.from(fragments.children),
-        { opacity: 0 },
-        {
-          opacity: 1,
-          duration: 0.5,
-          stagger: 0.15,
-          ease: 'power2.out',
-          // CSS animation takes over from here (floatFragment keyframe)
-          onComplete() {
-            Array.from(fragments.children).forEach((child) => {
-              (child as HTMLElement).style.opacity = '';  // let CSS keyframe control
-            });
-          },
-        },
-        `>+0.2`
-      );
+      // Phase 1 (0% → 15%): Astronaut lifts up to center position
+      heroTl.to(astronautWrapper, {
+        y: liftY,
+        rotation: 0,
+        opacity: 1,
+        duration: 0.15,
+        ease: 'power1.out',
+      }, 0);
+
+      // Phase 2 (15% → 25%): Brief still phase — astronaut stays at lifted position
+      heroTl.to(astronautWrapper, {
+        y: liftY,
+        rotation: 0,
+        opacity: 1,
+        duration: 0.10,
+        ease: 'none',
+      }, 0.15);
+
+
+      // Phase 3 (25% → 85%): Astronaut rotates to -40deg and drifts down slightly
+      heroTl.to(astronautWrapper, {
+        rotation: -40,
+        y: driftY, // gentle downward drift relative to its lifted position
+        opacity: 1,
+        duration: 0.60,
+        ease: 'power1.inOut',
+      }, 0.25);
+
+      heroTl.to(nebula2, {
+        yPercent: -15,
+        scale: 1.4,
+        opacity: 0.4,
+        duration: 0.60,
+        ease: 'power2.inOut',
+      }, 0.25);
+
+      heroTl.to(nebulaWhite, {
+        yPercent: -12,
+        scale: 1.5,
+        opacity: 0.3,
+        duration: 0.60,
+        ease: 'power1.inOut',
+      }, 0.25);
+
+      heroTl.to(nebula4, {
+        yPercent: -12,
+        scale: 1.4,
+        opacity: 0.4,
+        duration: 0.60,
+        ease: 'power1.inOut',
+      }, 0.25);
+
+      // Phase 4 (85% → 100%): Clouds rise further, astronaut rotates to -70deg and sinks down
+      heroTl.to(astronautWrapper, {
+        rotation: -70,
+        y: sinkY, // sinks into clouds
+        opacity: 0,
+        duration: 0.15,
+        ease: 'power2.in',
+      }, 0.85);
+
+      heroTl.to(nebula2, {
+        yPercent: -20,
+        scale: 1.6,
+        opacity: 1, // Fade to full opacity at the very end for screen transition
+        duration: 0.15,
+        ease: 'power2.in',
+      }, 0.85);
+
+      heroTl.to(nebulaWhite, {
+        yPercent: -16,
+        scale: 1.7,
+        opacity: 1,
+        duration: 0.15,
+        ease: 'power2.in',
+      }, 0.85);
+
+      heroTl.to(nebula4, {
+        yPercent: -16,
+        scale: 1.6,
+        opacity: 1,
+        duration: 0.15,
+        ease: 'power2.in',
+      }, 0.85);
+
+      // Fade out space background gradient and stars
+      const spaceBg = section.querySelector(`.${styles.spaceBg}`);
+      if (spaceBg) {
+        heroTl.to(spaceBg, {
+          opacity: 0,
+          duration: 0.15,
+          ease: 'power2.in',
+        }, 0.85);
+      }
+
+      // Transition outer section background color to pure white
+      heroTl.to(section, {
+        backgroundColor: '#ffffff',
+        duration: 0.15,
+        ease: 'power2.in',
+      }, 0.85);
+
+      // Hero titles fade out
+      heroTl.to(heroContent, {
+        opacity: 0,
+        y: -50,
+        duration: 0.5,
+        ease: 'none',
+      }, 0);
+
+      ScrollTrigger.refresh();
     }, section);
 
     return () => ctx.revert();
-  }, []);
-
-  /* ============================================================
-     RENDER
-     ============================================================ */
+  }, [isReady, prefersReduced]);
 
   return (
     <section
       ref={sectionRef}
+      id="hero"
       className={styles.section}
-      aria-label="Chapter 1: Initialize Protocol"
-      data-chapter="1"
+      aria-label="Landing Page"
     >
-      {/* ── Starfield ── */}
-      <div className={styles.stars} aria-hidden="true">
-        {STARS.map((star) => (
-          <span
-            key={star.id}
-            className={styles.star}
-            style={{
-              top: star.top,
-              left: star.left,
-              width: `${star.size}px`,
-              height: `${star.size}px`,
-              opacity: star.opacity,
-            }}
+      {/* Persistent Space Background */}
+      <div className={styles.spaceBg}>
+        <img
+          ref={nebula1Ref}
+          className={`${styles.nebula} ${styles.nebula1}`}
+          src="https://static.wixstatic.com/media/c22c23_d819e8b92a894a33a043b793a706120f~mv2.webp"
+          alt="Nebula Cloud 1"
+          draggable="false"
+        />
+        <img
+          ref={nebula3Ref}
+          className={`${styles.nebula} ${styles.nebula3}`}
+          src="https://static.wixstatic.com/media/c22c23_8e765412bde541e0b53a8a623dcacb06~mv2.webp"
+          alt="Nebula Cloud 3"
+          draggable="false"
+        />
+        <div className={styles.starsOverlay}></div>
+      </div>
+
+      <div ref={contentWrapperRef} className={styles.contentWrapper}>
+        {/* Persistent Astronaut Foreground */}
+        <div ref={astronautWrapperRef} className={styles.astronautWrapper}>
+          <img
+            ref={astronautRef}
+            className={styles.astronaut}
+            src={astronautImg}
+            alt="Floating Astronaut"
+            draggable="false"
           />
-        ))}
-      </div>
-
-      {/* ── Distant butterfly galaxy (placeholder radial-gradient) ── */}
-      {/*  Swap className to styles.galaxyImg and add src once the  */}
-      {/*  real asset src/assets/planets/galaxy-butterfly.png exists */}
-      <div className={styles.galaxy} aria-hidden="true" />
-
-      {/* ── Terminal type-out ── */}
-      <div
-        ref={terminalRef}
-        className={styles.terminal}
-        aria-live="polite"
-        aria-label="System initializing"
-      >
-        {TERMINAL_LINES.map((_, i) => (
-          <span
-            key={i}
-            ref={setLineRef(i)}
-            className={styles.terminalLine}
-          />
-        ))}
-        <span ref={cursorRef} className={styles.terminalCursor} aria-hidden="true" />
-      </div>
-
-      {/* ── Hero: Name ── */}
-      <div ref={heroRef} className={styles.hero}>
-        <h1 className={styles.name}>Arjun</h1>
-      </div>
-
-      {/* ── Mission label + scroll hint ── */}
-      <div ref={missionRef} className={styles.missionWrap}>
-        <p className={styles.missionLabel}>Initialize Mission</p>
-        <p className={styles.missionSub}>Scroll to Begin</p>
-        <div className={styles.chevron} aria-hidden="true">
-          &#8964; {/* ⌄ downward chevron */}
         </div>
-      </div>
 
-      {/* ── Engineer character (placeholder silhouette) ── */}
-      {/*  Replace .characterPlaceholder with <img> once            */}
-      {/*  src/assets/characters/engineer.png is available.         */}
-      <div ref={characterRef} className={styles.character} aria-hidden="true">
-        <div className={styles.characterPlaceholder} />
-      </div>
+        {/* Persistent Foreground Clouds */}
+        <div className={styles.foregroundClouds}>
+          <img
+            ref={nebula2Ref}
+            className={`${styles.nebula} ${styles.nebula2}`}
+            src="https://static.wixstatic.com/media/c22c23_9a1b1bb5f049443588d24db8db7e5f2f~mv2.webp"
+            alt="Nebula Cloud 2"
+            draggable="false"
+          />
+          <img
+            ref={nebulaWhiteRef}
+            className={`${styles.nebula} ${styles.nebulaWhite}`}
+            src="https://static.wixstatic.com/media/c22c23_8f37a335d68a40549a38de362bb0f454~mv2.webp"
+            alt="White Cloud"
+            draggable="false"
+          />
+          <img
+            ref={nebula4Ref}
+            className={`${styles.nebula} ${styles.nebula4}`}
+            src="https://static.wixstatic.com/media/c22c23_30cd5e6319c54527b06e1c517fa0b36c~mv2.webp"
+            alt="Nebula Cloud 4"
+            draggable="false"
+          />
+        </div>
 
-      {/* ── Floating code fragments ── */}
-      <div
-        ref={fragmentsRef}
-        className={styles.codeFragments}
-        aria-hidden="true"
-      >
-        {FRAGMENTS.map((frag) => (
-          <span
-            key={frag.id}
-            className={styles.codeFragment}
-            style={{
-              left: frag.left,
-              bottom: frag.bottom,
-              '--dur':   frag.dur,
-              '--delay': frag.delay,
-              '--drift': frag.drift,
-            } as React.CSSProperties}
-          >
-            {frag.label}
-          </span>
-        ))}
-      </div>
-
-      {/* ── Foreground cloud layer (placeholder gradient) ── */}
-      {/*  Replace .cloudPlaceholder with real cloud PNGs once       */}
-      {/*  src/assets/clouds/* assets are available.                 */}
-      <div className={styles.clouds} aria-hidden="true">
-        <div className={styles.cloudPlaceholder} />
+        {/* Hero Content */}
+        <div ref={heroContentRef} className={styles.heroContent}>
+          <div className={styles.titleContainer}>
+            <h1 className={styles.name}>
+              <span className={styles.titleWord}>ARJUN</span>
+              <span className={styles.titleGap}></span>
+              <span className={styles.titleWord}>V</span>
+            </h1>
+          </div>
+        </div>
       </div>
     </section>
   );

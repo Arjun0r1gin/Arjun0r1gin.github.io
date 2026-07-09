@@ -14,6 +14,7 @@ export interface DevLog {
   date: string;
   summary: string;
   size: 'small' | 'medium' | 'large';
+  url: string;
 }
 
 export const devlogs: DevLog[] = [
@@ -27,6 +28,7 @@ export const devlogs: DevLog[] = [
       'against simulated telemetry. Confirmed the hypothesis that orbital-data ' +
       'patterns could expose injection attempts.',
     size: 'large',
+    url: 'https://github.com/Arjun0r1gin/RAKSHASTRA',
   },
   {
     id: 'rakshastra-v2',
@@ -38,6 +40,7 @@ export const devlogs: DevLog[] = [
       'engine with a probability-weighted scoring system. First live test against ' +
       'public TLE feeds returned 94% precision on synthetic injections.',
     size: 'large',
+    url: 'https://github.com/Arjun0r1gin/RAKSHASTRA',
   },
   {
     id: 'rakshastra-v3',
@@ -49,6 +52,7 @@ export const devlogs: DevLog[] = [
       'spoofed uplink frames. ML model re-trained on expanded dataset. Writeup ' +
       'submitted for internal review.',
     size: 'large',
+    url: 'https://github.com/Arjun0r1gin/RAKSHASTRA',
   },
   {
     id: 'ep-sat-design',
@@ -59,6 +63,7 @@ export const devlogs: DevLog[] = [
       'Defined sensor fusion architecture, selected RTOS, and produced the first ' +
       'draft of the interface control document. Telemetry packet format locked.',
     size: 'medium',
+    url: 'https://github.com/Arjun0r1gin/EP-SAT',
   },
   {
     id: 'ep-sat-pdr',
@@ -69,6 +74,7 @@ export const devlogs: DevLog[] = [
       'against hardware-in-loop test bench. Attitude-determination module passed ' +
       'simulation at ±2° accuracy. Launch campaign timeline set.',
     size: 'medium',
+    url: 'https://github.com/Arjun0r1gin/EP-SAT',
   },
   {
     id: 'powerhouse-tech',
@@ -80,6 +86,7 @@ export const devlogs: DevLog[] = [
       'dashboard for a local ISP. Established Linux-first development workflow ' +
       'across the team.',
     size: 'small',
+    url: 'https://github.com/Arjun0r1gin',
   },
 ];
 

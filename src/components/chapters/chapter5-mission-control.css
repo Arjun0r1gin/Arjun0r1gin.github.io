@@ -8,28 +8,52 @@
   position: relative;
   height: 100vh;
   overflow: hidden;
-  background: var(--void-0);
+  background: #020205; /* Solid black base framing top/bottom */
   contain: layout style;
 }
 
+.c5-window {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  border-top: 1px solid rgba(143, 216, 210, 0.12);
+  border-bottom: 1px solid rgba(143, 216, 210, 0.12);
+  background-color: #10211e; /* Initial deep teal-green space color */
+  will-change: background-color;
+}
+
 /* ---------- distant blueprint grid (parallax backdrop) ---------- */
-.c5-grid {
+.c5-grid-container {
   position: absolute;
   inset: 0 auto 0 0;
   height: 100%;
   will-change: transform;
+  overflow: hidden;
+}
+
+.c5-grid-3d {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   background-image:
     linear-gradient(
       to right,
-      color-mix(in srgb, var(--signal-teal) 7%, transparent) 1px,
+      rgba(255, 255, 255, 0.08) 1px,
       transparent 1px
     ),
     linear-gradient(
       to bottom,
-      color-mix(in srgb, var(--signal-teal) 7%, transparent) 1px,
+      rgba(255, 255, 255, 0.08) 1px,
       transparent 1px
     );
-  background-size: 72px 72px;
+  background-size: 40px 40px; /* Denser, smaller square boxes */
+  /* Smoothly fade out the grid lines at the top of the screen near the title area */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.15) 3.5vh, rgba(0, 0, 0, 1) 12vh);
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.15) 3.5vh, rgba(0, 0, 0, 1) 12vh);
 }
 
 /* ---------- light-year distance readout ruler ---------- */
@@ -309,31 +333,203 @@
   text-shadow: 0 0 10px rgba(0, 0, 0, 0.95);
 }
 
-/* ---------- corner badge ---------- */
-.c5-badge {
+
+/* ---------- centered title at the top with parallax scroll ---------- */
+.c5-title {
   position: absolute;
-  right: 3vw;
-  bottom: 4vh;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(8, 6, 13, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 4px;
-  padding: 6px 12px;
-  font-family: var(--font-display, sans-serif);
-  font-size: 11px;
+  left: 50%;
+  top: 0.8vh; /* Positioned at the absolute top of the black header frame */
+  transform: translateX(-50%);
+  font-family: 'Rubik Glitch', system-ui !important;
+  font-size: clamp(1.8rem, 4vw, 3.2rem); /* More elegant size for top heading */
+  font-weight: 300;
   color: #ffffff;
+  letter-spacing: 0.22em; /* Wider letter spacing for tech dossier aesthetic */
+  white-space: nowrap;
+  opacity: 1;
   pointer-events: none;
-  backdrop-filter: blur(8px);
+  text-shadow: 0 0 20px rgba(0, 0, 0, 0.45);
+  z-index: 15;
 }
 
-.c5-badge i {
+.c5-title-letter {
   display: inline-block;
-  width: 8px;
-  height: 8px;
-  background: #ffffff;
-  border-radius: 1px;
+  will-change: opacity, text-shadow, transform;
+  opacity: 0; /* Prevents flash before entry ScrollTrigger runs */
+}
+
+.c5-title-letter-float {
+  display: inline-block;
+  will-change: transform;
+  animation: letterFloat 5s ease-in-out infinite;
+  transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1), color 0.4s ease, text-shadow 0.4s ease;
+}
+
+.c5-title-letter:hover .c5-title-letter-float {
+  transform: translateY(-8px) scale(1.25) !important;
+  color: var(--signal-teal, #8fd8d2) !important;
+  text-shadow: 0 0 15px rgba(143, 216, 210, 0.7) !important;
+  cursor: default;
+}
+
+/* Staggered animation delays for the letters to float asynchronously */
+.c5-title-letter:nth-child(2n) .c5-title-letter-float {
+  animation-delay: 0.5s;
+  animation-duration: 5.5s;
+}
+.c5-title-letter:nth-child(3n) .c5-title-letter-float {
+  animation-delay: 1s;
+  animation-duration: 6s;
+}
+.c5-title-letter:nth-child(4n) .c5-title-letter-float {
+  animation-delay: 1.5s;
+  animation-duration: 4.8s;
+}
+
+@keyframes letterFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* ---------- Pinned dynamic category progress indicator ---------- */
+.c5-category-header {
+  position: absolute;
+  top: 3.2vh;
+  left: 6.5vw;
+  right: 6.5vw;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 15;
+  pointer-events: none;
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  will-change: opacity, transform;
+}
+
+.c5-category-title {
+  position: relative;
+  font-family: 'Rubik Glitch', system-ui !important;
+  font-size: clamp(1.1rem, 2.2vw, 1.45rem);
+  letter-spacing: 0.18em;
+  margin: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: text-shadow 0.6s ease, opacity 0.6s ease, transform 0.6s ease, filter 0.3s ease;
+  will-change: transform, opacity, font-weight;
+}
+
+.c5-category-title:hover,
+.c5-category-title:focus-visible {
+  filter: brightness(1.2) drop-shadow(0 0 4px rgba(143, 216, 210, 0.4));
+  outline: none;
+}
+
+/* Base style modifiers for software and hardware category states */
+.c5-category-title--software {
+  color: #00ff00;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(0, 255, 0, 0.8), 0 0 20px rgba(0, 255, 0, 0.4);
+}
+
+.c5-category-title--hardware {
+  color: #006600;
+  opacity: 0.35;
+  font-weight: 400;
+  text-shadow: none;
+  transform: scale(0.95);
+}
+
+/* Category underline */
+.c5-category-underline {
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: rgba(0, 255, 0, 0.85);
+  box-shadow: 0 0 8px rgba(0, 255, 0, 0.8), 0 0 16px rgba(0, 255, 0, 0.4);
+  transform-origin: left center;
+  transform: scaleX(0);
+  opacity: 0;
+  will-change: transform, opacity, box-shadow;
+}
+
+/* Software is active initially, so scale its underline */
+.c5-category-title--software .c5-category-underline {
+  transform: scaleX(1);
+  opacity: 0.85;
+  animation: accentGlowPulse 2.5s ease-in-out infinite;
+}
+
+/* Accent pulse keyframes for the active category underline */
+.c5-category-underline--pulse {
+  animation: accentGlowPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes accentGlowPulse {
+  0%, 100% {
+    opacity: 0.85;
+    box-shadow: 0 0 8px rgba(143, 216, 210, 0.8), 0 0 16px rgba(143, 216, 210, 0.4);
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 16px rgba(143, 216, 210, 0.95), 0 0 32px rgba(143, 216, 210, 0.6);
+    filter: brightness(1.25) saturate(1.2);
+  }
+}
+
+/* Mobile vs Desktop text variants */
+.c5-desktop-text {
+  display: inline;
+}
+
+.c5-mobile-text {
+  display: none;
+}
+
+.c5-category-divider {
+  display: none;
+  color: #555555;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  opacity: 0.5;
+}
+
+/* Responsive queries */
+@media (max-width: 860px) {
+  /* Tablet layout */
+  .c5-category-header {
+    left: 8vw;
+    right: 8vw;
+    top: 2.8vh;
+  }
+}
+
+@media (max-width: 600px) {
+  /* Mobile layout: display as SOFTWARE | HARDWARE on a single row */
+  .c5-category-header {
+    justify-content: center;
+    left: 4vw;
+    right: 4vw;
+    top: 2.5vh;
+    gap: 14px;
+  }
+
+  .c5-desktop-text {
+    display: none;
+  }
+
+  .c5-mobile-text {
+    display: inline;
+  }
+
+  .c5-category-divider {
+    display: block;
+  }
 }
 
 /* ==================================================================
@@ -434,4 +630,162 @@
   font-size: 13px;
   line-height: 1.55;
   color: var(--ink-1);
+}
+
+.c5-static-title {
+  position: absolute;
+  top: calc(100% + 15px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-terminal);
+  font-size: clamp(10px, 1.1vw, 13px);
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffffff;
+  text-transform: uppercase;
+  text-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.8),
+    0 0 10px rgba(143, 216, 210, 0.5); /* Glowing text shadows */
+  white-space: nowrap;
+  pointer-events: none;
+  text-align: center;
+  z-index: 5;
+}
+
+@media (max-width: 480px) {
+  .c5f-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+  .c5f-card__name {
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+/* Hide desktop tooltip card on mobile touchscreens */
+@media (max-width: 767px) {
+  .c5-card {
+    display: none !important;
+  }
+}
+
+/* ---------- mobile-only HUD console panel ---------- */
+.c5-hud-panel {
+  position: fixed;
+  bottom: 24px;
+  left: 16px;
+  right: 16px;
+  background: rgba(10, 11, 20, 0.94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 18px 20px;
+  border-radius: 6px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.85);
+  animation: c5-hud-fade-in 200ms var(--ease-cosmic) forwards;
+  will-change: transform, opacity;
+}
+
+.c5-hud-panel__glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  opacity: 0.05;
+  filter: blur(15px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.c5-hud-panel__border {
+  position: absolute;
+  inset: 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+/* Corner highlights on mobile HUD */
+.c5-hud-panel__border::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  border-top: 1.5px solid #ffffff;
+  border-left: 1.5px solid #ffffff;
+  opacity: 0.9;
+}
+
+.c5-hud-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.c5-hud-panel__name {
+  font-family: var(--font-display, sans-serif);
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.c5-hud-panel__tag {
+  font-family: var(--font-terminal, monospace);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.c5-hud-panel__blurb {
+  margin: 0;
+  font-family: var(--font-terminal, monospace);
+  font-size: 12px;
+  line-height: 1.6;
+  color: #d1d5db;
+  text-align: left;
+}
+
+.c5-hud-panel__btn {
+  border: none;
+  padding: 10px 14px;
+  border-radius: 4px;
+  color: #111111;
+  font-family: var(--font-terminal, monospace);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: opacity 150ms ease, transform 100ms ease;
+  width: 100%;
+  text-align: center;
+}
+
+.c5-hud-panel__btn:active {
+  transform: scale(0.98);
+}
+
+@keyframes c5-hud-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

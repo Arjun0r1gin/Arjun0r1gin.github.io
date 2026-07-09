@@ -7,12 +7,13 @@
  * Click: fade+scale modal with full entry details.
  * Prefers-reduced-motion: asteroids static; hover/click still work.
  */
-import { useLayoutEffect, useRef, useState, useEffect, useCallback } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react';
 import { gsap } from '../../lib/scroll';
 import { useAnimationReady } from '../../animations/hooks/useAnimationReady';
 import { useReducedMotion } from '../../animations/hooks/useReducedMotion';
 import TerminalText from '../common/TerminalText';
-import { devlogs, type DevLog } from '../../data/devlogs';
+import { type DevLog } from '../../data/devlogs';
+import { useCms } from '../../providers/CmsProvider';
 import styles from './Chapter6LogsArchive.module.css';
 
 /* ────────────────────────────────────────────────────────────
@@ -36,37 +37,30 @@ interface AsteroidPlacement {
   rotation: number;
 }
 
-/** Deterministic pseudo-random seeded with a string seed */
-function seededRng(seed: string) {
-  let h = 2166136261;
-  for (let i = 0; i < seed.length; i++) {
-    h = Math.imul(h ^ seed.charCodeAt(i), 16777619);
-  }
-  return () => {
-    h += h << 13; h ^= h >>> 7; h += h << 3; h ^= h >>> 17; h += h << 5;
-    return ((h >>> 0) / 0xffffffff);
-  };
-}
+const PLACEMENTS_CONFIG: Array<{ layer: LayerName; x: number; y: number; rotation: number }> = [
+  // 0. rakshastra-v1 (large, near)
+  { layer: 'near', x: -10, y: 15, rotation: 12 },
+  // 1. rakshastra-v2 (large, mid)
+  { layer: 'mid', x: 75, y: 10, rotation: -25 },
+  // 2. rakshastra-v3 (large, far)
+  { layer: 'far', x: 22, y: 45, rotation: 35 },
+  // 3. ep-sat-design (medium, near)
+  { layer: 'near', x: 15, y: 80, rotation: -18 },
+  // 4. ep-sat-pdr (medium, mid)
+  { layer: 'mid', x: 70, y: 85, rotation: 22 }
+];
 
 /** Assign each log to a layer and scatter positions. */
 function buildPlacements(logs: DevLog[]): AsteroidPlacement[] {
-  const layers: LayerName[] = ['far', 'mid', 'near'];
   return logs.map((log, i) => {
-    const rng = seededRng(log.id);
+    const config = PLACEMENTS_CONFIG[i % PLACEMENTS_CONFIG.length];
     return {
       log,
-      layer: layers[i % 3],
-      x: 8 + rng() * 80,        // 8%–88% from left
-      y: 5 + rng() * 85,        // 5%–90% from section top
-      rotation: rng() * 40 - 20, // ±20deg
+      ...config
     };
   });
 }
-
-const PLACEMENTS = buildPlacements(devlogs as DevLog[]);
-
-/** Parallax speed per layer — far slowest, near fastest */
-const PARALLAX: Record<LayerName, number> = { far: 0.2, mid: 0.4, near: 0.6 };
+// Placements are built dynamically within the component body using useCms()
 
 /* ────────────────────────────────────────────────────────────
    SCRAMBLE TEXT HOOK
@@ -94,10 +88,11 @@ function scramble(target: string): string[] {
 
 interface AsteroidProps {
   placement: AsteroidPlacement;
+  globalIndex: number;
   onClick: (log: DevLog) => void;
 }
 
-function Asteroid({ placement, onClick }: AsteroidProps) {
+function Asteroid({ placement, globalIndex, onClick }: AsteroidProps) {
   const { log, x, y, rotation, layer } = placement;
   const [hovered, setHovered] = useState(false);
   const [previewLines, setPreviewLines] = useState<string[]>([]);
@@ -137,6 +132,8 @@ function Asteroid({ placement, onClick }: AsteroidProps) {
   useEffect(() => () => clearScramble(), [clearScramble]);
 
   const sizeClass = styles[log.size] ?? styles.medium;
+  const imgIndex = (globalIndex % 4) + 1; // 1, 2, 3, 4
+  const asteroidImageClass = styles[`asteroid${imgIndex}`];
 
   return (
     <div
@@ -153,7 +150,7 @@ function Asteroid({ placement, onClick }: AsteroidProps) {
         role="button"
         tabIndex={0}
         aria-label={`Dev log: ${log.title} — click to expand`}
-        className={`${styles.asteroid} ${sizeClass}`}
+        className={`${styles.asteroid} ${sizeClass} ${asteroidImageClass}`}
         onMouseEnter={handleEnter}
         onMouseLeave={handleLeave}
         onFocus={handleEnter}
@@ -296,13 +293,24 @@ function Modal({ log, onClose }: ModalProps) {
 ──────────────────────────────────────────────────────────── */
 
 export default function Chapter6LogsArchive() {
-  const sectionRef    = useRef<HTMLElement>(null);
-  const layerFarRef   = useRef<HTMLDivElement>(null);
-  const layerMidRef   = useRef<HTMLDivElement>(null);
-  const layerNearRef  = useRef<HTMLDivElement>(null);
+  const sectionRef        = useRef<HTMLElement>(null);
+  const layerFarRef       = useRef<HTMLDivElement>(null);
+  const layerMidRef       = useRef<HTMLDivElement>(null);
+  const layerNearRef      = useRef<HTMLDivElement>(null);
+  const headerRef         = useRef<HTMLDivElement>(null);
+
+  // New refs for typography transition integration
+  const textContainerRef  = useRef<HTMLDivElement>(null);
+  const line1Ref          = useRef<HTMLHeadingElement>(null);
+  const line2Ref          = useRef<HTMLDivElement>(null);
+  const line3Ref          = useRef<HTMLHeadingElement>(null);
+  const transitionBgRef   = useRef<HTMLDivElement>(null);
 
   const isReady        = useAnimationReady();
   const prefersReduced = useReducedMotion();
+  
+  const { devlogs } = useCms();
+  const placements = buildPlacements(devlogs);
 
   const [activeLog, setActiveLog] = useState<DevLog | null>(null);
 
@@ -310,39 +318,161 @@ export default function Chapter6LogsArchive() {
   const handleClose = useCallback(() => setActiveLog(null), []);
 
   /* ── Parallax ScrollTrigger (skipped if reduced-motion) ── */
-  useLayoutEffect(() => {
-    if (!isReady || prefersReduced) return;
+  useEffect(() => {
+    if (!isReady) return;
 
-    const section  = sectionRef.current;
-    const layerFar  = layerFarRef.current;
-    const layerMid  = layerMidRef.current;
+    const section = sectionRef.current;
+    const layerFar = layerFarRef.current;
+    const layerMid = layerMidRef.current;
     const layerNear = layerNearRef.current;
-    if (!section || !layerFar || !layerMid || !layerNear) return;
+    const header = headerRef.current;
+    const textContainer = textContainerRef.current;
+    const line1 = line1Ref.current;
+    const line2 = line2Ref.current;
+    const line3 = line3Ref.current;
+    const transitionBg = transitionBgRef.current;
 
-    // Section height determines max parallax travel distance
-    const ctx = gsap.context(() => {
-      const layers: [HTMLDivElement, LayerName][] = [
-        [layerFar,  'far'],
-        [layerMid,  'mid'],
-        [layerNear, 'near'],
-      ];
+    if (!section || !layerFar || !layerMid || !layerNear || !header || !textContainer || !line1 || !line2 || !line3 || !transitionBg) return;
 
-      layers.forEach(([el, name]) => {
-        const speed = PARALLAX[name];
-        // Negative: element moves upward slower than scroll = classic depth parallax
-        const travel = -(section.offsetHeight * speed);
-
-        gsap.to(el, {
-          y: travel,
-          ease: 'none',
+    if (prefersReduced) {
+      const ctx = gsap.context(() => {
+        const tl = gsap.timeline({
           scrollTrigger: {
             trigger: section,
-            start: 'top bottom',
-            end: 'bottom top',
+            start: 'top top',
+            end: '+=200%',
+            pin: true,
             scrub: true,
-          },
+            invalidateOnRefresh: true,
+          }
         });
+
+        // 1. Headers fade in then out
+        tl.fromTo(header, { opacity: 0 }, { opacity: 1, duration: 0.3 });
+        tl.to(header, { opacity: 0, duration: 0.3 }, '+=0.4');
+
+        // 2. Typography fades in then out
+        gsap.set([line1, line2, line3], { opacity: 0, scale: 1, xPercent: 0, y: 0 });
+        tl.to([line1, line2, line3], { opacity: 1, stagger: 0.2, duration: 0.5 });
+        tl.to([line1, line2, line3], { opacity: 0, duration: 0.3 }, '+=0.3');
+      }, section);
+
+      return () => ctx.revert();
+    }
+
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: 'top top',
+          end: '+=520%', // Expanded scroll space for highly paced Apple-style cinematic transitions
+          pin: true,
+          scrub: true,
+          invalidateOnRefresh: true,
+        }
       });
+
+      // 1. Initially fade in the headers (Chapter title)
+      tl.fromTo(header,
+        { opacity: 0, y: 40 },
+        { opacity: 1, y: 0, ease: 'power1.out', duration: 0.06 },
+        0
+      );
+
+      // 2. Animate the parallax layers up from bottom of viewport to top of viewport (ends by 0.22 progress)
+      // Far layer
+      tl.fromTo(layerFar,
+        { y: '90vh' },
+        { y: '-90vh', ease: 'none', duration: 0.20 },
+        0.02
+      );
+      // Mid layer
+      tl.fromTo(layerMid,
+        { y: '100vh' },
+        { y: '-140vh', ease: 'none', duration: 0.20 },
+        0.02
+      );
+      // Near layer
+      tl.fromTo(layerNear,
+        { y: '110vh' },
+        { y: '-190vh', ease: 'none', duration: 0.20 },
+        0.02
+      );
+
+      // 3. Fade out the header as asteroids are scrolling away
+      tl.to(header,
+        { opacity: 0, y: -20, ease: 'power1.in', duration: 0.06 },
+        0.18
+      );
+
+      // 4. Initially set all elements (typography off-screen right, invisible by default to prevent overflow, overlay bg invisible)
+      gsap.set(line1, { xPercent: 100, opacity: 0 });
+      gsap.set(line2, { xPercent: 100, opacity: 0 });
+      gsap.set(line3, { xPercent: 100, opacity: 0, scale: 0.95, color: '#F8F8F8' });
+      gsap.set(transitionBg, { opacity: 0, backgroundColor: '#F9F9F9' });
+
+      // 5. ── PHASE 1: LINE 1 (AND IF SOME IDEA) ──
+      // Instantly make Line 1 visible at start of Phase 1 (0.24)
+      tl.set(line1, { opacity: 1 }, 0.24);
+      // Glides continuously across the screen from 100% (right) to -100% (left) from 0.24 to 0.58 progress
+      tl.fromTo(line1,
+        { xPercent: 100 },
+        { xPercent: -100, ease: 'none', duration: 0.34 },
+        0.24
+      );
+      // Instantly hide Line 1 when it completes its exit
+      tl.set(line1, { opacity: 0 }, 0.58);
+
+      // 6. ── PHASE 2: LINE 2 (EXCITES YOU / THAT DOESN'T LET YOU SLEEP,) ──
+      // Instantly make Line 2 visible at 0.44 progress (entering right behind Line 1)
+      tl.set(line2, { opacity: 1 }, 0.44);
+      // Glides continuously across the screen from 100% to -100% from 0.44 to 0.78 progress
+      tl.fromTo(line2,
+        { xPercent: 100 },
+        { xPercent: -100, ease: 'none', duration: 0.34 },
+        0.44
+      );
+      // Instantly hide Line 2 when it completes its exit
+      tl.set(line2, { opacity: 0 }, 0.78);
+
+      // 7. ── PHASE 3: LINE 3 (THEN WE SHOULD MEET.) ──
+      // Instantly make Line 3 visible at 0.64 progress (entering right behind Line 2)
+      tl.set(line3, { opacity: 1 }, 0.64);
+      // Glides from 100% (right) and settles at 0% (centered) from 0.64 to 0.81 progress
+      tl.fromTo(line3,
+        { xPercent: 100, scale: 0.95 },
+        { xPercent: 0, scale: 1.0, ease: 'none', duration: 0.17 },
+        0.64
+      );
+      // Holds Line 3 locked in center until unpinning (0.81 to 1.00)
+      // Instantly hide Line 3 when unpinning at 1.00 to prevent overflow into Chapter 8
+      tl.set(line3, { opacity: 0 }, 1.00);
+
+      // 8. ── BACKGROUND & COLOR MORPH TRANSITIONS ──
+      // As Line 3 enters and Line 2 is exiting (around 0.68 progress), morph the background overlay
+      // from transparent to solid white, and smoothly transition the text colors from white to black
+      // to maintain perfect readability.
+      tl.fromTo(transitionBg,
+        { opacity: 0, backgroundColor: '#F9F9F9' },
+        { opacity: 1, ease: 'none', duration: 0.08 },
+        0.68
+      );
+      tl.to(line2,
+        { color: '#111111', ease: 'none', duration: 0.08 },
+        0.68
+      );
+      tl.to(line3,
+        { color: '#111111', ease: 'none', duration: 0.08 },
+        0.68
+      );
+
+      // Transition the background color from white to mint teal (#9fd5ca) from 0.85 to 1.00 progress.
+      // This matches Chapter 8's top background color exactly for a seamless scroll handoff.
+      tl.to(transitionBg,
+        { backgroundColor: '#9fd5ca', ease: 'none', duration: 0.15 },
+        0.85
+      );
+
     }, section);
 
     return () => ctx.revert();
@@ -350,7 +480,7 @@ export default function Chapter6LogsArchive() {
 
   /* ── Group placements by layer for rendering ── */
   const byLayer = (layer: LayerName) =>
-    PLACEMENTS.filter((p) => p.layer === layer);
+    placements.filter((p) => p.layer === layer);
 
   return (
     <>
@@ -361,9 +491,13 @@ export default function Chapter6LogsArchive() {
         data-chapter="6"
       >
         {/* Sticky header */}
-        <div className={styles.header}>
-          <p className={styles.chapterLabel}>[ Chapter 06 ]</p>
-          <h2 className={styles.title}>Logs Archive</h2>
+        <div ref={headerRef} className={styles.header}>
+          <p className={styles.chapterLabel}>
+            <span className={styles.floatText}>[ Chapter 06 ]</span>
+          </p>
+          <h2 className={styles.title}>
+            <span className={styles.floatText}>LOGS ARCHIVE</span>
+          </h2>
         </div>
 
         {/* Parallax layer container */}
@@ -374,9 +508,10 @@ export default function Chapter6LogsArchive() {
             className={styles.layer}
             data-layer="far"
           >
-            {byLayer('far').map((p) => (
-              <Asteroid key={p.log.id} placement={p} onClick={handleOpen} />
-            ))}
+            {byLayer('far').map((p) => {
+              const globalIndex = devlogs.findIndex((d) => d.id === p.log.id);
+              return <Asteroid key={p.log.id} globalIndex={globalIndex} placement={p} onClick={handleOpen} />;
+            })}
           </div>
 
           {/* Mid layer */}
@@ -385,9 +520,10 @@ export default function Chapter6LogsArchive() {
             className={styles.layer}
             data-layer="mid"
           >
-            {byLayer('mid').map((p) => (
-              <Asteroid key={p.log.id} placement={p} onClick={handleOpen} />
-            ))}
+            {byLayer('mid').map((p) => {
+              const globalIndex = devlogs.findIndex((d) => d.id === p.log.id);
+              return <Asteroid key={p.log.id} globalIndex={globalIndex} placement={p} onClick={handleOpen} />;
+            })}
           </div>
 
           {/* Near layer — fastest */}
@@ -396,10 +532,24 @@ export default function Chapter6LogsArchive() {
             className={styles.layer}
             data-layer="near"
           >
-            {byLayer('near').map((p) => (
-              <Asteroid key={p.log.id} placement={p} onClick={handleOpen} />
-            ))}
+            {byLayer('near').map((p) => {
+              const globalIndex = devlogs.findIndex((d) => d.id === p.log.id);
+              return <Asteroid key={p.log.id} globalIndex={globalIndex} placement={p} onClick={handleOpen} />;
+            })}
           </div>
+        </div>
+
+        {/* Transition background overlay — fades in to blend with Chapter 8 sky */}
+        <div ref={transitionBgRef} className={styles.transitionBg} />
+
+        {/* Integrated Typography Overlay — fades in as asteroids exit */}
+        <div ref={textContainerRef} className={styles.textContainer}>
+          <h3 ref={line1Ref} className={`${styles.line} ${styles.line1}`}>AND IF SOME IDEA</h3>
+          <div ref={line2Ref} className={`${styles.line} ${styles.line2}`}>
+            <div>EXCITES YOU</div>
+            <div>THAT DOESN'T LET YOU SLEEP,</div>
+          </div>
+          <h3 ref={line3Ref} className={`${styles.line} ${styles.line3}`}>THEN WE SHOULD MEET.</h3>
         </div>
       </section>
 

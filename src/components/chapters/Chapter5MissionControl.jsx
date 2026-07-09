@@ -1,11 +1,15 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { usePinnedTimeline } from '../../animations/hooks/usePinnedTimeline';
+
+gsap.registerPlugin(ScrollTrigger);
 import { useReducedMotion } from '../../animations/hooks/useReducedMotion';
 import { useViewport } from '../../animations/hooks/useViewport';
 import { Z_INDEX } from '../../animations/constants';
 import { AnimationContext } from '../../providers/AnimationProvider';
-import { projects } from '../../data/projects';
+import { useCms } from '../../providers/CmsProvider';
+import ResolvedImage from '../common/ResolvedImage';
 import './chapter5-mission-control.css';
 
 /* ------------------------------------------------------------------ *
@@ -23,11 +27,14 @@ const resolveImage = (imagePath) => planetImages[imagePath] ?? imagePath;
 /* ------------------------------------------------------------------ *
  * TRACK-WIDTH CALCULATION
  *
- * Pinned horizontal track scrolls across 3.4 viewports (340vw).
+ * The track is 340vw wide. The camera must travel (track.scrollWidth -
+ * viewport.width) pixels to bring every planet into view.
+ * We supply `end` as a function so GSAP evaluates it at setup AND on
+ * every invalidateOnRefresh, giving a pixel-accurate pin duration that
+ * adapts to any viewport size without any React re-render involvement.
  * ------------------------------------------------------------------ */
 const TRACK_VW = 340;
-const TRAVEL_VW = TRACK_VW - 100; // horizontal distance the camera pans
-const PIN_END = `+=${TRAVEL_VW}%`; // ScrollTrigger end (percent of viewport height)
+const TRAVEL_VW = TRACK_VW - 100; // 240 — fallback for pre-mount estimate
 
 // Background grid + ruler move at a slower rate than the planet track
 // for parallax depth (distant backdrop).
@@ -39,8 +46,9 @@ export default function Chapter5MissionControl() {
   const reducedMotion = useReducedMotion();
   const { width } = useViewport();
 
-  // Below 768px OR reduced motion: no pin, no track — stacked cards.
-  const useFallback = width < 768 || reducedMotion;
+  // Fallback is only used if the user explicitly prefers reduced motion.
+  // The full interactive horizontal belt scrolls on all mobile viewports.
+  const useFallback = reducedMotion;
 
   return useFallback ? (
     <FallbackList reducedMotion={reducedMotion} />
@@ -54,28 +62,204 @@ export default function Chapter5MissionControl() {
  * ================================================================== */
 function BeltScene() {
   const { lenis } = useContext(AnimationContext);
+  const { projects } = useCms();
   const sectionRef = useRef(null);
   const trackRef = useRef(null);
   const gridRef = useRef(null);
   const rulerRef = useRef(null);
+  const windowRef = useRef(null);
+  const softwareTitleRef = useRef(null);
+  const hardwareTitleRef = useRef(null);
+  const currentCategoryRef = useRef('software');
+
   const spinTargets = useRef(new Map()); // id -> { el, spinDur }
   const bodyEls = useRef(new Map()); // id -> focusable element
   const [activeId, setActiveId] = useState(null);
 
+  const activeProject = useMemo(() => {
+    return projects.find((p) => p.id === activeId);
+  }, [activeId, projects]);
+
+  const triggerCategoryCrossfade = useCallback((activeCategory) => {
+    const softEl = softwareTitleRef.current;
+    const hardEl = hardwareTitleRef.current;
+    if (!softEl || !hardEl) return;
+
+    const softUnderline = softEl.querySelector('.c5-category-underline');
+    const hardUnderline = hardEl.querySelector('.c5-category-underline');
+
+    if (activeCategory === 'software') {
+      gsap.to(softEl, {
+        color: '#00ff00',
+        opacity: 1,
+        scale: 1,
+        fontWeight: '700',
+        textShadow: '0 0 10px rgba(0, 255, 0, 0.8), 0 0 20px rgba(0, 255, 0, 0.4)',
+        duration: 1,
+        ease: 'power2.out',
+        overwrite: 'auto'
+      });
+      if (softUnderline) {
+        gsap.to(softUnderline, {
+          scaleX: 1,
+          opacity: 0.85,
+          duration: 1,
+          ease: 'power2.out',
+          overwrite: 'auto'
+        });
+        softUnderline.classList.add('c5-category-underline--pulse');
+      }
+
+      gsap.to(hardEl, {
+        color: '#006600',
+        opacity: 0.35,
+        scale: 0.95,
+        fontWeight: '400',
+        textShadow: 'none',
+        duration: 1,
+        ease: 'power2.out',
+        overwrite: 'auto'
+      });
+      if (hardUnderline) {
+        gsap.to(hardUnderline, {
+          scaleX: 0,
+          opacity: 0,
+          duration: 1,
+          ease: 'power2.out',
+          overwrite: 'auto'
+        });
+        hardUnderline.classList.remove('c5-category-underline--pulse');
+      }
+    } else {
+      gsap.to(hardEl, {
+        color: '#00ff00',
+        opacity: 1,
+        scale: 1,
+        fontWeight: '700',
+        textShadow: '0 0 10px rgba(0, 255, 0, 0.8), 0 0 20px rgba(0, 255, 0, 0.4)',
+        duration: 1,
+        ease: 'power2.out',
+        overwrite: 'auto'
+      });
+      if (hardUnderline) {
+        gsap.to(hardUnderline, {
+          scaleX: 1,
+          opacity: 0.85,
+          duration: 1,
+          ease: 'power2.out',
+          overwrite: 'auto'
+        });
+        hardUnderline.classList.add('c5-category-underline--pulse');
+      }
+
+      gsap.to(softEl, {
+        color: '#006600',
+        opacity: 0.35,
+        scale: 0.95,
+        fontWeight: '400',
+        textShadow: 'none',
+        duration: 1,
+        ease: 'power2.out',
+        overwrite: 'auto'
+      });
+      if (softUnderline) {
+        gsap.to(softUnderline, {
+          scaleX: 0,
+          opacity: 0,
+          duration: 1,
+          ease: 'power2.out',
+          overwrite: 'auto'
+        });
+        softUnderline.classList.remove('c5-category-underline--pulse');
+      }
+    }
+  }, []);
+
+  const handleScrollUpdate = useCallback((self) => {
+    const track = trackRef.current;
+    if (!track) return;
+    const bodies = track.querySelectorAll('.c5-body');
+    if (!bodies.length) return;
+
+    let closestIndex = 0;
+    let minDistance = Infinity;
+    const centerX = window.innerWidth / 2;
+
+    bodies.forEach((body, index) => {
+      const rect = body.getBoundingClientRect();
+      const bodyCenterX = rect.left + rect.width / 2;
+      const distance = Math.abs(bodyCenterX - centerX);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIndex = index;
+      }
+    });
+
+    const activeCategory = closestIndex <= 5 ? 'software' : 'hardware';
+
+    if (currentCategoryRef.current !== activeCategory) {
+      currentCategoryRef.current = activeCategory;
+      triggerCategoryCrossfade(activeCategory);
+    }
+  }, [triggerCategoryCrossfade]);
+
   // ONE ScrollTrigger pins the section and scrubs the shared timeline.
+  // `end` is a function so GSAP evaluates the pixel distance at setup
+  // AND on every resize/invalidateOnRefresh — always pixel-perfect.
   const timeline = usePinnedTimeline(sectionRef, {
     start: 'top top',
-    end: PIN_END,
-    scrollTriggerConfig: { invalidateOnRefresh: true, anticipatePin: 1 },
+    end: () => {
+      const track = trackRef.current;
+      if (!track) return `+=${Math.round(window.innerWidth * (TRAVEL_VW / 100))}`;
+      return `+=${Math.max(track.scrollWidth - window.innerWidth, 0)}`;
+    },
+    scrollTriggerConfig: {
+      onUpdate: (self) => {
+        handleScrollUpdate(self);
+      }
+    }
   });
+
+  const scrollToCategory = useCallback((category) => {
+    const st = timeline?.scrollTrigger;
+    const track = trackRef.current;
+    if (!st || !track) return;
+
+    const targetId = category === 'software' ? 'rakshastra' : 'telemetry-db';
+    const el = bodyEls.current.get(targetId);
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const trackLeft = track.getBoundingClientRect().left;
+
+    const centerInTrack = rect.left + rect.width / 2 - trackLeft;
+    const travel = Math.max(track.scrollWidth - vw, 0);
+    const targetX = clamp(centerInTrack - vw / 2, 0, travel);
+    const progress = travel > 0 ? targetX / travel : 0;
+    const scrollY = st.start + progress * (st.end - st.start);
+
+    if (lenis) {
+      lenis.scrollTo(scrollY, {
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+      });
+    } else {
+      window.scrollTo({ top: scrollY, behavior: 'smooth' });
+    }
+  }, [timeline, lenis]);
 
   /* ---- The core mechanic: scroll progress -> track translateX ---- */
   useEffect(() => {
+    triggerCategoryCrossfade('software');
     if (!timeline) return;
     const track = trackRef.current;
     const grid = gridRef.current;
     const ruler = rulerRef.current;
-    if (!track || !grid || !ruler) return;
+    const windowEl = windowRef.current;
+    const softwareTitleEl = softwareTitleRef.current;
+    const hardwareTitleEl = hardwareTitleRef.current;
+    if (!track || !grid || !ruler || !windowEl || !softwareTitleEl || !hardwareTitleEl) return;
 
     // Travel = full track width minus one viewport; recomputed on refresh.
     const travel = () => Math.max(track.scrollWidth - window.innerWidth, 0);
@@ -93,10 +277,67 @@ function BeltScene() {
       0
     );
 
+    // Dynamic background color transition inside the horizontal window
+    timeline.to(
+      windowEl,
+      {
+        backgroundColor: '#1c152a', // Deep cosmic indigo/purple in the middle
+        duration: 0.5,
+        ease: 'none',
+      },
+      0
+    );
+    timeline.to(
+      windowEl,
+      {
+        backgroundColor: '#020205', // Solid black at the end
+        duration: 0.5,
+        ease: 'none',
+      },
+      0.5
+    );
+
+    // Entry reveal ScrollTrigger: pops the letters as the section scrolls into view
+    let entryST = null;
+    const titleEl = document.querySelector('.c5-title');
+    if (titleEl) {
+      const titleLetters = titleEl.querySelectorAll('.c5-title-letter');
+      if (titleLetters.length > 0) {
+        // Set initial values
+        gsap.set(titleLetters, { opacity: 0, scale: 0.3, y: 35, transformOrigin: 'center bottom' });
+
+        entryST = ScrollTrigger.create({
+          trigger: sectionRef.current,
+          start: 'top bottom', // Starts when the top of Chapter 5 enters the bottom of viewport
+          end: 'top 5%',       // Completes just before it pins
+          scrub: 0.5,
+          animation: gsap.to(
+            titleLetters,
+            {
+              opacity: 1,
+              scale: 1,
+              y: 0,
+              textShadow: '0 0 10px rgba(143, 216, 210, 0.6)',
+              stagger: 0.05,
+              ease: 'back.out(2)', // springy bounce pop-out
+            }
+          )
+        });
+      }
+    }
+
+    // Fade out the entire category header near the end of scroll
+    timeline.to(
+      '.c5-category-header',
+      { opacity: 0, y: -20, ease: 'power2.in', duration: 0.15 },
+      0.85
+    );
+
     return () => {
       timeline.clear();
+      if (entryST) entryST.kill();
     };
-  }, [timeline]);
+  }, [timeline, triggerCategoryCrossfade, handleScrollUpdate]);
 
   /* ---- Ambient motion: shared gsap.ticker (scroll-independent) ---- */
   useEffect(() => {
@@ -163,7 +404,7 @@ function BeltScene() {
         spinDur: 40 + (index * 7) % 31,
       };
     }).filter(Boolean);
-  }, []);
+  }, [projects]);
 
   // Ruler ticks: one every 4vw across the ruler strip.
   const rulerWidthVw = TRACK_VW * GRID_PARALLAX + 100;
@@ -186,16 +427,38 @@ function BeltScene() {
     className: `c5-body c5-body--${p.size}${
       activeId === p.id ? ' is-active' : ''
     }`,
-    onMouseEnter: () => setActiveId(p.id),
-    onMouseLeave: () => setActiveId((cur) => (cur === p.id ? null : cur)),
+    onMouseEnter: () => {
+      if (window.innerWidth >= 768) {
+        setActiveId(p.id);
+      }
+    },
+    onMouseLeave: () => {
+      if (window.innerWidth >= 768) {
+        setActiveId((cur) => (cur === p.id ? null : cur));
+      }
+    },
     onFocus: () => {
       setActiveId(p.id);
       revealBody(p.id);
     },
-    onBlur: () => setActiveId((cur) => (cur === p.id ? null : cur)),
+    onBlur: () => {
+      if (window.innerWidth >= 768) {
+        setActiveId((cur) => (cur === p.id ? null : cur));
+      }
+    },
     onClick: (e) => {
       e.preventDefault();
-      openMission(p.githubUrl);
+      e.stopPropagation();
+      if (window.innerWidth < 768) {
+        if (activeId === p.id) {
+          openMission(p.githubUrl);
+        } else {
+          setActiveId(p.id);
+          revealBody(p.id);
+        }
+      } else {
+        openMission(p.githubUrl);
+      }
     },
     onKeyDown: (e) => {
       if (e.key === ' ' || e.key === 'Enter') {
@@ -320,84 +583,167 @@ function BeltScene() {
       ref={sectionRef}
       className={`c5 ${activeId ? 'c5--has-active' : ''}`}
       aria-label="Chapter 5: Mission Control — project belt"
+      onClick={() => {
+        if (window.innerWidth < 768) {
+          setActiveId(null);
+        }
+      }}
     >
-      {/* Distant backdrop: blueprint grid, slow parallax layer */}
-      <div
-        ref={gridRef}
-        className="c5-grid"
-        style={{ width: `${rulerWidthVw}vw`, zIndex: Z_INDEX.BACKGROUND }}
-        aria-hidden="true"
-      />
-
-      {/* Light-year distance readout ruler — same parallax rate as the grid */}
-      <div
-        ref={rulerRef}
-        className="c5-ruler"
-        style={{ width: `${rulerWidthVw}vw`, zIndex: Z_INDEX.MIDGROUND }}
-        aria-hidden="true"
-      >
-        {ticks.map((i) => (
-          <span className="c5-ruler__tick" key={i}>
-            <i />
-            {(i * 0.4).toFixed(1)} LY
-          </span>
-        ))}
+      {/* Dynamic sticky Category Header */}
+      <div className="c5-category-header">
+        <h3
+          ref={softwareTitleRef}
+          className="c5-category-title c5-category-title--software"
+          onClick={() => scrollToCategory('software')}
+          onKeyDown={(e) => {
+            if (e.key === ' ' || e.key === 'Enter') {
+              e.preventDefault();
+              scrollToCategory('software');
+            }
+          }}
+          tabIndex={0}
+          role="button"
+          aria-label="Navigate to Software Projects"
+        >
+          <span className="c5-desktop-text">SOFTWARE PROJECTS</span>
+          <span className="c5-mobile-text">SOFTWARE</span>
+          <div className="c5-category-underline" />
+        </h3>
+        <div className="c5-category-divider">|</div>
+        <h3
+          ref={hardwareTitleRef}
+          className="c5-category-title c5-category-title--hardware"
+          onClick={() => scrollToCategory('hardware')}
+          onKeyDown={(e) => {
+            if (e.key === ' ' || e.key === 'Enter') {
+              e.preventDefault();
+              scrollToCategory('hardware');
+            }
+          }}
+          tabIndex={0}
+          role="button"
+          aria-label="Navigate to Hardware Projects"
+        >
+          <span className="c5-desktop-text">HARDWARE PROJECTS</span>
+          <span className="c5-mobile-text">HARDWARE</span>
+          <div className="c5-category-underline" />
+        </h3>
       </div>
 
-      {/* Ambient chrome: radar rings fixed in a corner, not track-bound */}
-      <div
-        className="c5-radar"
-        style={{ zIndex: Z_INDEX.UI_LAYER }}
-        aria-hidden="true"
-      >
-        <i />
-        <i />
-        <i />
+      {/* Horizontal window block framed by solid black top/bottom blocks */}
+      <div ref={windowRef} className="c5-window">
+
+        {/* Distant backdrop: blueprint grid, slow parallax layer */}
+        <div
+          ref={gridRef}
+          className="c5-grid-container"
+          style={{ width: `${rulerWidthVw}vw`, zIndex: Z_INDEX.BACKGROUND }}
+          aria-hidden="true"
+        >
+          {/* Twinkling alternatively background stars */}
+          <div className="cosmos-universe-stars-a" style={{ pointerEvents: 'none', position: 'absolute', inset: 0 }} />
+          <div className="cosmos-universe-stars-b" style={{ pointerEvents: 'none', position: 'absolute', inset: 0 }} />
+          <div className="c5-grid-3d" />
+        </div>
+
+        {/* Light-year distance readout ruler — same parallax rate as the grid */}
+        <div
+          ref={rulerRef}
+          className="c5-ruler"
+          style={{ width: `${rulerWidthVw}vw`, zIndex: Z_INDEX.MIDGROUND }}
+          aria-hidden="true"
+        >
+          {ticks.map((i) => (
+            <span className="c5-ruler__tick" key={i}>
+              <i />
+              {(i * 0.4).toFixed(1)} LY
+            </span>
+          ))}
+        </div>
+
+        {/* Ambient chrome: radar rings fixed in a corner, not track-bound */}
+        <div
+          className="c5-radar"
+          style={{ zIndex: Z_INDEX.UI_LAYER }}
+          aria-hidden="true"
+        >
+          <i />
+          <i />
+          <i />
+        </div>
+
+
+        {/* THE TRACK — wider than the viewport, panned via translateX */}
+        <div
+          ref={trackRef}
+          className="c5-track"
+          style={{ width: `${TRACK_VW}vw`, zIndex: Z_INDEX.FOREGROUND }}
+        >
+          {slots.map(({ project: p, sizeVw, yOffVh, centerVw, spinDur }) => (
+            <div
+              key={p.id}
+              className="c5-slot"
+              style={{
+                left: `${centerVw}vw`,
+                top: `calc(50% + ${yOffVh}vh)`,
+                width: `${sizeVw}vw`,
+                height: `${sizeVw}vw`,
+              }}
+            >
+              <a {...sharedBodyProps(p)}>
+                <ResolvedImage
+                  ref={(el) => {
+                    if (el) spinTargets.current.set(p.id, { el, spinDur });
+                    else spinTargets.current.delete(p.id);
+                  }}
+                  className="c5-body__img"
+                  srcPath={p.imagePath}
+                  fallbackSrc={resolveImage(p.imagePath)}
+                  alt=""
+                  loading="lazy"
+                  draggable="false"
+                />
+                {renderCard(p, yOffVh)}
+              </a>
+
+              {/* Permanent project title sitting below the planet */}
+              <div className="c5-static-title">
+                {p.name}
+              </div>
+
+              {/* Wix-style Connector Line and Label */}
+              {renderConnectorAndLabel(p.id)}
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* "Built on WIX STUDIO" Badge in the bottom-right corner */}
-      <div className="c5-badge" style={{ zIndex: Z_INDEX.UI_LAYER }} aria-hidden="true">
-        <i />
-        Built on <strong>WIX STUDIO</strong>
-      </div>
-
-      {/* THE TRACK — wider than the viewport, panned via translateX */}
-      <div
-        ref={trackRef}
-        className="c5-track"
-        style={{ width: `${TRACK_VW}vw`, zIndex: Z_INDEX.FOREGROUND }}
-      >
-        {slots.map(({ project: p, sizeVw, yOffVh, centerVw, spinDur }) => (
-          <div
-            key={p.id}
-            className="c5-slot"
-            style={{
-              left: `${centerVw}vw`,
-              top: `calc(50% + ${yOffVh}vh)`,
-              width: `${sizeVw}vw`,
-              height: `${sizeVw}vw`,
-            }}
-          >
-            <a {...sharedBodyProps(p)}>
-              <img
-                ref={(el) => {
-                  if (el) spinTargets.current.set(p.id, { el, spinDur });
-                  else spinTargets.current.delete(p.id);
-                }}
-                className="c5-body__img"
-                src={resolveImage(p.imagePath)}
-                alt=""
-                loading="lazy"
-                draggable="false"
-              />
-              {renderCard(p, yOffVh)}
-            </a>
-
-            {/* Wix-style Connector Line and Label */}
-            {renderConnectorAndLabel(p.id)}
+      {/* Mobile HUD panel rendered at the root level of BeltScene */}
+      {activeProject && (
+        <div className="c5-hud-panel" onClick={(e) => e.stopPropagation()}>
+          <div className="c5-hud-panel__glow" style={{ backgroundColor: activeProject.accentColor }} />
+          <div className="c5-hud-panel__border" style={{ borderColor: activeProject.accentColor }} />
+          <div className="c5-hud-panel__header">
+            <span className="c5-hud-panel__name">{activeProject.name}</span>
+            {activeProject.orbitsParentId && (
+              <span className="c5-hud-panel__tag" style={{ color: activeProject.accentColor }}>
+                MOON OF {activeProject.orbitsParentId.toUpperCase()}
+              </span>
+            )}
           </div>
-        ))}
-      </div>
+          <p className="c5-hud-panel__blurb">{activeProject.blurb}</p>
+          <button
+            className="c5-hud-panel__btn"
+            style={{ 
+              backgroundColor: activeProject.accentColor,
+              boxShadow: `0 0 15px ${activeProject.accentColor}`
+            }}
+            onClick={() => openMission(activeProject.githubUrl)}
+          >
+            LAUNCH PROJECT
+          </button>
+        </div>
+      )}
     </section>
   );
 }
@@ -407,6 +753,7 @@ function BeltScene() {
  * No pin, no track, real page scroll. Hover/focus/click still work.
  * ================================================================== */
 function FallbackList({ reducedMotion }) {
+  const { projects } = useCms();
   const listRef = useRef(null);
 
   // Simple scroll-reveal fade per card (opacity only), skipped entirely
@@ -426,7 +773,7 @@ function FallbackList({ reducedMotion }) {
     );
     cards.forEach((c) => io.observe(c));
     return () => io.disconnect();
-  }, [reducedMotion]);
+  }, [projects, reducedMotion]);
 
   return (
     <section
@@ -444,9 +791,10 @@ function FallbackList({ reducedMotion }) {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <img
+              <ResolvedImage
                 className="c5f-card__img"
-                src={resolveImage(p.imagePath)}
+                srcPath={p.imagePath}
+                fallbackSrc={resolveImage(p.imagePath)}
                 alt=""
                 loading="lazy"
               />
