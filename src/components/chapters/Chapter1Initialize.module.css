@@ -220,7 +220,6 @@
     right: auto !important;
     top: 24vh !important; /* Positioned high up below the ARJUN V heading */
     width: clamp(220px, 62vw, 300px) !important; /* Larger size to match mockup */
-    transform: translateX(-50%) !important;
     z-index: 10 !important;
   }
 
