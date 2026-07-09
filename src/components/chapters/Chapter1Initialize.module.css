@@ -196,15 +196,59 @@
 
 @media (max-width: 768px) {
   .name {
-    font-size: clamp(2rem, 8vw, 4rem);
+    font-size: clamp(2.2rem, 9vw, 3.8rem) !important;
+    flex-wrap: nowrap !important;
+    justify-content: center !important;
   }
+  
+  .titleWord {
+    display: inline-block !important;
+  }
+  
   .titleGap {
-    width: clamp(90px, 22vw, 120px);
+    width: clamp(70px, 18vw, 110px) !important;
+    flex-shrink: 0 !important;
   }
+
   .astronautWrapper {
-    width: clamp(160px, 40vw, 240px);
+    left: 50% !important;
+    right: auto !important;
+    top: calc(10vh + 1.2rem) !important; /* perfectly aligned inside titleGap vertically */
+    width: clamp(130px, 38vw, 180px) !important;
+    transform: translateX(-50%) !important;
   }
+
+  .nebula1 {
+    width: 55vw !important;
+    margin-left: 10vw !important;
+    margin-top: 15vh !important;
+    opacity: 0.15 !important;
+  }
+
+  .nebula3 {
+    width: 35vw !important;
+    margin-right: 2vw !important;
+    margin-top: 2vh !important;
+  }
+
+  .nebula2 {
+    width: 150vw !important;
+    margin-left: -25vw !important;
+    margin-top: 92vh !important;
+  }
+
+  .nebulaWhite {
+    width: 160vw !important;
+    margin-top: 90vh !important;
+  }
+
+  .nebula4 {
+    width: 150vw !important;
+    margin-top: 94vh !important;
+  }
+
   .heroContent {
-    height: 80vh;
+    height: 85vh !important;
+    padding-top: env(safe-area-inset-top, 20px) !important;
   }
 }
