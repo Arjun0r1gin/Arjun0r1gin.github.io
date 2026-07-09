@@ -37,6 +37,8 @@ export const AnimationProvider: React.FC<AnimationProviderProps> = ({ children }
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
+      syncTouch: true,        // Capture touch events to run in-sync with main thread on mobile
+      syncTouchLerp: 0.08,    // Mobile touch smooth interpolation factor
       wheelMultiplier: 1.0,   // Standard wheel sensitivity
       touchMultiplier: 1.0,   // Standard touch/trackpad sensitivity
     });
