@@ -196,9 +196,14 @@
 
 @media (max-width: 768px) {
   .name {
-    font-size: clamp(2.2rem, 9vw, 3.8rem) !important;
+    font-family: 'Playfair Display', serif !important;
+    font-size: clamp(2.5rem, 10vw, 4.2rem) !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.05em !important;
     flex-wrap: nowrap !important;
     justify-content: center !important;
+    color: #ffffff !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
   }
   
   .titleWord {
@@ -206,49 +211,59 @@
   }
   
   .titleGap {
-    width: clamp(70px, 18vw, 110px) !important;
+    width: clamp(20px, 6vw, 30px) !important; /* Elegant word space since astronaut is at the bottom */
     flex-shrink: 0 !important;
   }
 
   .astronautWrapper {
     left: 50% !important;
     right: auto !important;
-    top: calc(10vh + 1.2rem) !important; /* perfectly aligned inside titleGap vertically */
-    width: clamp(130px, 38vw, 180px) !important;
+    top: 48vh !important; /* Positioned lower to emerge from clouds like the mockup */
+    width: clamp(220px, 62vw, 300px) !important; /* Larger size to match the reference mockup */
     transform: translateX(-50%) !important;
+    z-index: 10 !important;
   }
 
   .nebula1 {
-    width: 55vw !important;
-    margin-left: 10vw !important;
-    margin-top: 15vh !important;
-    opacity: 0.15 !important;
+    width: 60vw !important;
+    margin-left: -10vw !important;
+    margin-top: 35vh !important;
+    opacity: 0.20 !important;
+    z-index: 8 !important;
   }
 
   .nebula3 {
-    width: 35vw !important;
-    margin-right: 2vw !important;
-    margin-top: 2vh !important;
+    width: 25vw !important;
+    margin-right: -4vw !important;
+    margin-top: -2vh !important; /* Pushed higher and off-center to prevent covering the 'V' */
+    opacity: 0.40 !important;
+    z-index: 1 !important;
   }
 
   .nebula2 {
     width: 150vw !important;
     margin-left: -25vw !important;
-    margin-top: 92vh !important;
+    margin-top: 52vh !important; /* Positioned higher to engulf lower body and hide laptop */
+    z-index: 9 !important;
+    opacity: 0.90 !important;
   }
 
   .nebulaWhite {
     width: 160vw !important;
-    margin-top: 90vh !important;
+    margin-top: 50vh !important; /* Thick white/purple fog layer covering the astronaut's waist */
+    z-index: 11 !important;
+    opacity: 0.95 !important;
   }
 
   .nebula4 {
     width: 150vw !important;
-    margin-top: 94vh !important;
+    margin-top: 56vh !important;
+    z-index: 12 !important;
+    opacity: 0.95 !important;
   }
 
   .heroContent {
     height: 85vh !important;
-    padding-top: env(safe-area-inset-top, 20px) !important;
+    padding-top: env(safe-area-inset-top, 24px) !important;
   }
 }
