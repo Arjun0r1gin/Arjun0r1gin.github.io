@@ -145,7 +145,6 @@ function Asteroid({ placement, globalIndex, onClick }: AsteroidProps) {
         zIndex: layer === 'near' ? 3 : layer === 'mid' ? 2 : 1,
       }}
     >
-      {/* The actual asteroid shape */}
       <div
         role="button"
         tabIndex={0}
@@ -163,6 +162,32 @@ function Asteroid({ placement, globalIndex, onClick }: AsteroidProps) {
           }
         }}
       />
+
+      {/* Project name label below the asteroid */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '100%',
+          left: '50%',
+          transform: `translateX(-50%) translateY(10px) rotate(${-rotation}deg)`,
+          fontFamily: `var(--font-terminal, ui-monospace, monospace)`,
+          fontSize: '9px',
+          fontWeight: 'bold',
+          letterSpacing: '1px',
+          color: '#00ff00',
+          textShadow: '0 0 5px rgba(0, 255, 0, 0.8)',
+          whiteSpace: 'nowrap',
+          textTransform: 'uppercase',
+          pointerEvents: 'none',
+          background: 'rgba(5, 5, 8, 0.85)',
+          border: '1px solid rgba(0, 255, 0, 0.35)',
+          borderRadius: '3px',
+          padding: '2px 6px',
+          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.6)',
+        }}
+      >
+        {log.title}
+      </div>
 
       {/* Hover preview — TerminalText scramble */}
       {hovered && previewLines.length > 0 && (
