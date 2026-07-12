@@ -169,6 +169,18 @@
   flex-shrink: 0;
 }
 
+.scrollIndicator {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-top: 1.5rem;
+  opacity: 0.6;
+  text-align: center;
+  width: 100%;
+}
+
 /* Responsive Media Queries */
 @media (max-width: 1024px) {
   .titleGap {

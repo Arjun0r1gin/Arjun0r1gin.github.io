@@ -303,6 +303,7 @@ export default function Chapter1Initialize() {
               <span className={styles.titleGap}></span>
               <span className={styles.titleWord}>V</span>
             </h1>
+            <p className={styles.scrollIndicator}>(scroll to explore)</p>
           </div>
         </div>
       </div>
