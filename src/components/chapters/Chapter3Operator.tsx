@@ -103,10 +103,10 @@ export const Chapter3Operator: React.FC = () => {
             fontWeight="normal"
             fontFamily={usePixelFont ? "'Press Start 2P', monospace" : "'Share Tech Mono', monospace"}
             color="#ffffff"
-            baseIntensity={0.12}
-            hoverIntensity={0.4}
+            baseIntensity={usePixelFont ? 0.12 : 0}
+            hoverIntensity={usePixelFont ? 0.4 : 0}
             fuzzRange={10}
-            clickEffect={true}
+            clickEffect={usePixelFont}
             transitionDuration={150}
             direction="both"
           >
@@ -127,10 +127,10 @@ export const Chapter3Operator: React.FC = () => {
             fontWeight="normal"
             fontFamily={usePixelFont ? "'Rubik Glitch', system-ui" : "'Share Tech Mono', monospace"}
             color="#00ff00"
-            baseIntensity={0.18}
-            hoverIntensity={0.5}
+            baseIntensity={usePixelFont ? 0.18 : 0}
+            hoverIntensity={usePixelFont ? 0.5 : 0}
             fuzzRange={6}
-            clickEffect={true}
+            clickEffect={usePixelFont}
             transitionDuration={150}
             direction="both"
           >
