@@ -372,17 +372,10 @@ export default function Chapter6LogsArchive() {
         tl.fromTo(header, { opacity: 0 }, { opacity: 1, duration: 0.3 });
         tl.to(header, { opacity: 0, duration: 0.3 }, '+=0.4');
 
-        // 2. Typography fades in then out sequentially to prevent overlapping on same line
-        gsap.set([line1, line2, line3], { opacity: 0, scale: 1, xPercent: 0, y: 0 });
-        
-        tl.to(line1, { opacity: 1, duration: 0.4 });
-        tl.to(line1, { opacity: 0, duration: 0.3 }, '+=0.3');
-        
-        tl.to(line2, { opacity: 1, duration: 0.4 });
-        tl.to(line2, { opacity: 0, duration: 0.3 }, '+=0.3');
-        
-        tl.to(line3, { opacity: 1, duration: 0.4 });
-        tl.to(line3, { opacity: 0, duration: 0.3 }, '+=0.3');
+        // 2. Typography fades in then out sequentially
+        gsap.set(line1, { opacity: 0, scale: 1, xPercent: 0, y: 0 });
+        tl.to(line1, { opacity: 1, duration: 0.8 });
+        tl.to(line1, { opacity: 0, duration: 0.5 }, '+=0.5');
       }, section);
 
       return () => ctx.revert();
@@ -439,59 +432,30 @@ export default function Chapter6LogsArchive() {
       gsap.set(line3, { xPercent: 100, opacity: 0, scale: 0.95, color: '#F8F8F8' });
       gsap.set(transitionBg, { opacity: 0, backgroundColor: '#F9F9F9' });
 
-      // 5. ── PHASE 1: LINE 1 (AND IF SOME IDEA) ──
+      // 5. ── PHASE 1: LINE 1 (SINGLE CONTINUOUS HORIZONTAL TEXT FLOW) ──
       // Instantly make Line 1 visible at start of Phase 1 (0.24)
       tl.set(line1, { opacity: 1 }, 0.24);
-      // Glides continuously across the screen from 100% (right) to -100% (left) from 0.24 to 0.46 progress
+      // Glides continuously across the screen from 100% (right) to -135% (left) from 0.24 to 0.85 progress
       tl.fromTo(line1,
         { xPercent: 100 },
-        { xPercent: -100, ease: 'none', duration: 0.22 },
+        { xPercent: -135, ease: 'none', duration: 0.61 },
         0.24
       );
       // Instantly hide Line 1 when it completes its exit
-      tl.set(line1, { opacity: 0 }, 0.46);
-
-      // 6. ── PHASE 2: LINE 2 (EXCITES YOU, THAT DOESN'T LET YOU SLEEP,) ──
-      // Instantly make Line 2 visible at 0.48 progress (completely sequential, no overlap with Line 1)
-      tl.set(line2, { opacity: 1 }, 0.48);
-      // Glides continuously across the screen from 100% to -100% from 0.48 to 0.72 progress
-      tl.fromTo(line2,
-        { xPercent: 100 },
-        { xPercent: -100, ease: 'none', duration: 0.24 },
-        0.48
-      );
-      // Instantly hide Line 2 when it completes its exit
-      tl.set(line2, { opacity: 0 }, 0.72);
-
-      // 7. ── PHASE 3: LINE 3 (THEN WE SHOULD MEET.) ──
-      // Instantly make Line 3 visible at 0.74 progress (completely sequential, no overlap with Line 2)
-      tl.set(line3, { opacity: 1 }, 0.74);
-      // Glides from 100% (right) and settles at 0% (centered) from 0.74 to 0.88 progress
-      tl.fromTo(line3,
-        { xPercent: 100, scale: 0.95 },
-        { xPercent: 0, scale: 1.0, ease: 'none', duration: 0.14 },
-        0.74
-      );
-      // Holds Line 3 locked in center until unpinning (0.88 to 1.00)
-      // Instantly hide Line 3 when unpinning at 1.00 to prevent overflow into Chapter 8
-      tl.set(line3, { opacity: 0 }, 1.00);
+      tl.set(line1, { opacity: 0 }, 0.85);
 
       // 8. ── BACKGROUND & COLOR MORPH TRANSITIONS ──
-      // As Line 2 is exiting and Line 3 is about to enter (around 0.70 progress), morph the background overlay
+      // As the sentence glides past (around 0.60 progress), morph the background overlay
       // from transparent to solid white, and smoothly transition the text colors from white to black
       // to maintain perfect readability.
       tl.fromTo(transitionBg,
         { opacity: 0, backgroundColor: '#F9F9F9' },
-        { opacity: 1, ease: 'none', duration: 0.06 },
-        0.70
+        { opacity: 1, ease: 'none', duration: 0.08 },
+        0.60
       );
-      tl.to(line2,
-        { color: '#111111', ease: 'none', duration: 0.06 },
-        0.70
-      );
-      tl.to(line3,
-        { color: '#111111', ease: 'none', duration: 0.06 },
-        0.70
+      tl.to(line1,
+        { color: '#111111', ease: 'none', duration: 0.08 },
+        0.60
       );
 
       // Transition the background color from white to mint teal (#9fd5ca) from 0.85 to 1.00 progress.
@@ -585,9 +549,11 @@ export default function Chapter6LogsArchive() {
 
         {/* Integrated Typography Overlay — fades in as asteroids exit */}
         <div ref={textContainerRef} className={styles.textContainer}>
-          <h3 ref={line1Ref} className={`${styles.line} ${styles.line1}`}>AND IF SOME IDEA</h3>
-          <h3 ref={line2Ref} className={`${styles.line} ${styles.line2}`}>EXCITES YOU, THAT DOESN'T LET YOU SLEEP,</h3>
-          <h3 ref={line3Ref} className={`${styles.line} ${styles.line3}`}>THEN WE SHOULD MEET.</h3>
+          <h3 ref={line1Ref} className={`${styles.line} ${styles.line1}`}>
+            AND IF SOME IDEA EXCITES YOU, THAT DOESN'T LET YOU SLEEP, THEN WE SHOULD MEET.
+          </h3>
+          <div ref={line2Ref} style={{ display: 'none' }} />
+          <div ref={line3Ref} style={{ display: 'none' }} />
         </div>
       </section>
 
