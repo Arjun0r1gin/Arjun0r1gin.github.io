@@ -77,12 +77,14 @@ function BeltScene() {
   const spinTargets = useRef(new Map()); // id -> { el, spinDur }
   const bodyEls = useRef(new Map()); // id -> focusable element
   const [activeId, setActiveId] = useState(null);
+  const [activeCategoryState, setActiveCategoryState] = useState('software');
 
   const activeProject = useMemo(() => {
     return projects.find((p) => p.id === activeId);
   }, [activeId, projects]);
 
   const triggerCategoryCrossfade = useCallback((activeCategory) => {
+    setActiveCategoryState(activeCategory);
     const softEl = softwareTitleRef.current;
     const hardEl = hardwareTitleRef.current;
     if (!softEl || !hardEl) return;
@@ -605,10 +607,10 @@ function BeltScene() {
           <span className="c5-desktop-text" style={{ pointerEvents: 'none' }}>
             <FuzzyText
               fontSize="clamp(1.1rem, 2.2vw, 1.45rem)"
-              fontWeight={activeCategory === 'software' ? 700 : 400}
+              fontWeight={activeCategoryState === 'software' ? 700 : 400}
               fontFamily="'Rubik Glitch', system-ui"
-              color={activeCategory === 'software' ? '#00ff00' : '#006600'}
-              baseIntensity={activeCategory === 'software' ? 0.2 : 0.08}
+              color={activeCategoryState === 'software' ? '#00ff00' : '#006600'}
+              baseIntensity={activeCategoryState === 'software' ? 0.2 : 0.08}
               hoverIntensity={0.5}
               fuzzRange={5}
               clickEffect={true}
@@ -621,10 +623,10 @@ function BeltScene() {
           <span className="c5-mobile-text" style={{ pointerEvents: 'none' }}>
             <FuzzyText
               fontSize="clamp(1.1rem, 2.2vw, 1.45rem)"
-              fontWeight={activeCategory === 'software' ? 700 : 400}
+              fontWeight={activeCategoryState === 'software' ? 700 : 400}
               fontFamily="'Rubik Glitch', system-ui"
-              color={activeCategory === 'software' ? '#00ff00' : '#006600'}
-              baseIntensity={activeCategory === 'software' ? 0.2 : 0.08}
+              color={activeCategoryState === 'software' ? '#00ff00' : '#006600'}
+              baseIntensity={activeCategoryState === 'software' ? 0.2 : 0.08}
               hoverIntensity={0.5}
               fuzzRange={5}
               clickEffect={true}
@@ -654,10 +656,10 @@ function BeltScene() {
           <span className="c5-desktop-text" style={{ pointerEvents: 'none' }}>
             <FuzzyText
               fontSize="clamp(1.1rem, 2.2vw, 1.45rem)"
-              fontWeight={activeCategory === 'hardware' ? 700 : 400}
+              fontWeight={activeCategoryState === 'hardware' ? 700 : 400}
               fontFamily="'Rubik Glitch', system-ui"
-              color={activeCategory === 'hardware' ? '#00ff00' : '#006600'}
-              baseIntensity={activeCategory === 'hardware' ? 0.2 : 0.08}
+              color={activeCategoryState === 'hardware' ? '#00ff00' : '#006600'}
+              baseIntensity={activeCategoryState === 'hardware' ? 0.2 : 0.08}
               hoverIntensity={0.5}
               fuzzRange={5}
               clickEffect={true}
@@ -670,10 +672,10 @@ function BeltScene() {
           <span className="c5-mobile-text" style={{ pointerEvents: 'none' }}>
             <FuzzyText
               fontSize="clamp(1.1rem, 2.2vw, 1.45rem)"
-              fontWeight={activeCategory === 'hardware' ? 700 : 400}
+              fontWeight={activeCategoryState === 'hardware' ? 700 : 400}
               fontFamily="'Rubik Glitch', system-ui"
-              color={activeCategory === 'hardware' ? '#00ff00' : '#006600'}
-              baseIntensity={activeCategory === 'hardware' ? 0.2 : 0.08}
+              color={activeCategoryState === 'hardware' ? '#00ff00' : '#006600'}
+              baseIntensity={activeCategoryState === 'hardware' ? 0.2 : 0.08}
               hoverIntensity={0.5}
               fuzzRange={5}
               clickEffect={true}
