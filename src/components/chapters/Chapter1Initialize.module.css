@@ -3,6 +3,8 @@
  * Recreated exactly from wix-space/styles.css
  */
 
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&display=swap');
+
 .section {
   position: relative;
   width: 100%;
@@ -141,12 +143,13 @@
 }
 
 .name {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', Georgia, serif;
   font-size: clamp(3.5rem, 7.8vw, 8.5rem);
-  font-weight: 200;
+  font-weight: 400;
+  font-style: normal;
   line-height: 1;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.12em;
   color: #ffffff;
   margin-top: 0;
   display: flex;
@@ -181,10 +184,10 @@
 
 @media (max-width: 768px) {
   .name {
-    font-family: 'Playfair Display', serif !important;
+    font-family: 'Playfair Display', Georgia, serif !important;
     font-size: clamp(2.5rem, 10vw, 4.2rem) !important;
     font-weight: 400 !important;
-    letter-spacing: 0.05em !important;
+    letter-spacing: 0.1em !important;
     flex-wrap: nowrap !important;
     justify-content: center !important;
     color: #ffffff !important;
