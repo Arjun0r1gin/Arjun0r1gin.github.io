@@ -34,9 +34,9 @@ export const ParallaxStars: React.FC<ParallaxStarsProps> = ({
   zIndex = -1
 }) => {
   // Memoize shadows so they don't regenerate on every re-render
-  const shadowsSmall = useMemo(() => generateBoxShadows(700), []);
-  const shadowsMedium = useMemo(() => generateBoxShadows(200), []);
-  const shadowsBig = useMemo(() => generateBoxShadows(100), []);
+  const shadowsSmall = useMemo(() => generateBoxShadows(1200), []);
+  const shadowsMedium = useMemo(() => generateBoxShadows(350), []);
+  const shadowsBig = useMemo(() => generateBoxShadows(150), []);
 
   return (
     <div 
