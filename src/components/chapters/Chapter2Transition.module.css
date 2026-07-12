@@ -9,7 +9,7 @@
   overflow: hidden;
   contain: layout;
   background: #ffffff; /* Pure white background matching the visual reference */
-  margin-top: -1px; /* Overlap with Chapter 1 to eliminate subpixel gap lines */
+  margin-top: -4px; /* Overlap with Chapter 1 by 4px to eliminate high-DPI subpixel gap lines */
 }
 
 .nebula {
