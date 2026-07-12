@@ -86,7 +86,7 @@ export const ParallaxStars: React.FC<ParallaxStarsProps> = ({
             height: '1px',
             backgroundColor: 'transparent',
             boxShadow: shadowsSmall,
-            animation: `animStarScroll ${50 / speed}s linear infinite, twinkleFar 4.2s ease-in-out infinite`
+            animation: `animStarScroll ${50 / speed}s linear infinite, twinkleFar 8.5s ease-in-out infinite`
           }}
         >
           <div 
@@ -114,7 +114,7 @@ export const ParallaxStars: React.FC<ParallaxStarsProps> = ({
             height: '2px',
             backgroundColor: 'transparent',
             boxShadow: shadowsMedium,
-            animation: `animStarScroll ${100 / speed}s linear infinite, twinkleMid 6.8s ease-in-out infinite`
+            animation: `animStarScroll ${100 / speed}s linear infinite, twinkleMid 12.5s ease-in-out infinite`
           }}
         >
           <div 
@@ -142,7 +142,7 @@ export const ParallaxStars: React.FC<ParallaxStarsProps> = ({
             height: '3px',
             backgroundColor: 'transparent',
             boxShadow: shadowsBig,
-            animation: `animStarScroll ${150 / speed}s linear infinite, twinkleNear 8.5s ease-in-out infinite`
+            animation: `animStarScroll ${150 / speed}s linear infinite, twinkleNear 16.0s ease-in-out infinite`
           }}
         >
           <div 
