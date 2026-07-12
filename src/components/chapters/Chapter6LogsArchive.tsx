@@ -373,7 +373,8 @@ export default function Chapter6LogsArchive() {
         tl.to(header, { opacity: 0, duration: 0.3 }, '+=0.4');
 
         // 2. Typography fades in then out sequentially
-        gsap.set([line1, line3], { opacity: 0, scale: 1, xPercent: 0, y: 0 });
+        gsap.set(line1, { opacity: 0, scale: 1, xPercent: 0, y: 0 });
+        gsap.set(line3, { opacity: 0, scale: 1, xPercent: -50, yPercent: -50, y: 0 });
         
         tl.to(line1, { opacity: 1, duration: 0.6 });
         tl.to(line1, { opacity: 0, duration: 0.4 }, '+=0.4');
@@ -433,7 +434,7 @@ export default function Chapter6LogsArchive() {
       // 4. Initially set all elements (typography off-screen right, invisible by default to prevent overflow, overlay bg invisible)
       gsap.set(line1, { x: () => window.innerWidth, xPercent: 0, opacity: 0 });
       gsap.set(line2, { xPercent: 100, opacity: 0 });
-      gsap.set(line3, { xPercent: 100, scale: 0.95, color: '#F8F8F8', opacity: 0 });
+      gsap.set(line3, { xPercent: 100, yPercent: -50, scale: 0.95, color: '#F8F8F8', opacity: 0 });
       gsap.set(transitionBg, { opacity: 0, backgroundColor: '#F9F9F9' });
 
       // 5. ── PHASE 1: LINE 1 (SINGLE CONTINUOUS HORIZONTAL TEXT FLOW) ──
@@ -451,10 +452,10 @@ export default function Chapter6LogsArchive() {
       // 6. ── PHASE 2: LINE 3 (THEN YOU SHOULD MEET ME - LOCKED IN CENTER) ──
       // Instantly make Line 3 visible at 0.62 progress (entering behind Line 1)
       tl.set(line3, { opacity: 1 }, 0.62);
-      // Glides from off-screen right and settles at 0% (perfect center) by 0.78 progress
+      // Glides from off-screen right and settles at -50% (perfect center relative to left: 50%) by 0.78 progress
       tl.fromTo(line3,
-        { xPercent: 100, scale: 0.95 },
-        { xPercent: 0, scale: 1.0, ease: 'none', duration: 0.16 },
+        { xPercent: 100, yPercent: -50, scale: 0.95 },
+        { xPercent: -50, yPercent: -50, scale: 1.0, ease: 'none', duration: 0.16 },
         0.62
       );
       // Holds Line 3 locked in center until unpinning (0.78 to 1.00)
