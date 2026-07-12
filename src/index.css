@@ -123,7 +123,7 @@ code {
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  z-index: 2; /* Render on top of section backgrounds (z-index: 1) but behind text/interactive layers (z-index: 3+) */
+  z-index: 0; /* Render behind all text, interactive chapters, and parallax layers */
   overflow: hidden;
   background-color: transparent; /* Transparent to prevent blocking under-layered color transitions */
 }
