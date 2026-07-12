@@ -49,11 +49,29 @@ export const ParallaxStars: React.FC<ParallaxStarsProps> = ({
         opacity 
       }}
     >
-      {/* Inline styles for infinite vertical scroll animations */}
+      {/* Inline styles for infinite vertical scroll and twinkling animations */}
       <style>{`
         @keyframes animStarScroll {
           from { transform: translateY(0px); }
           to { transform: translateY(-2000px); }
+        }
+        @keyframes twinkleFar {
+          0%, 100% { opacity: 0.15; }
+          30% { opacity: 1.0; }
+          55% { opacity: 0.30; }
+          80% { opacity: 0.95; }
+        }
+        @keyframes twinkleMid {
+          0%, 100% { opacity: 0.90; }
+          25% { opacity: 0.20; }
+          60% { opacity: 1.00; }
+          75% { opacity: 0.15; }
+        }
+        @keyframes twinkleNear {
+          0%, 100% { opacity: 0.35; }
+          40% { opacity: 1.00; }
+          50% { opacity: 0.10; }
+          85% { opacity: 0.80; }
         }
       `}</style>
 
@@ -68,7 +86,7 @@ export const ParallaxStars: React.FC<ParallaxStarsProps> = ({
             height: '1px',
             backgroundColor: 'transparent',
             boxShadow: shadowsSmall,
-            animation: `animStarScroll ${50 / speed}s linear infinite`
+            animation: `animStarScroll ${50 / speed}s linear infinite, twinkleFar 4.2s ease-in-out infinite`
           }}
         >
           <div 
@@ -96,7 +114,7 @@ export const ParallaxStars: React.FC<ParallaxStarsProps> = ({
             height: '2px',
             backgroundColor: 'transparent',
             boxShadow: shadowsMedium,
-            animation: `animStarScroll ${100 / speed}s linear infinite`
+            animation: `animStarScroll ${100 / speed}s linear infinite, twinkleMid 6.8s ease-in-out infinite`
           }}
         >
           <div 
@@ -124,7 +142,7 @@ export const ParallaxStars: React.FC<ParallaxStarsProps> = ({
             height: '3px',
             backgroundColor: 'transparent',
             boxShadow: shadowsBig,
-            animation: `animStarScroll ${150 / speed}s linear infinite`
+            animation: `animStarScroll ${150 / speed}s linear infinite, twinkleNear 8.5s ease-in-out infinite`
           }}
         >
           <div 
