@@ -165,14 +165,14 @@
 
 .titleGap {
   display: inline-block;
-  width: 230px;
+  width: 80px;
   flex-shrink: 0;
 }
 
 /* Responsive Media Queries */
 @media (max-width: 1024px) {
   .titleGap {
-    width: 150px;
+    width: 60px;
   }
   .astronautWrapper {
     left: 50%;
