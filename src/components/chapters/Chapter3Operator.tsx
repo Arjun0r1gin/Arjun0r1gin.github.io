@@ -1,14 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSectionProgress } from '../../animations/hooks/useSectionProgress';
 import { useCms } from '../../providers/CmsProvider';
 import styles from './Chapter3Operator.module.css';
-import ResolvedImage from '../common/ResolvedImage';
 import { FuzzyText } from '../common/FuzzyText';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export const Chapter3Operator: React.FC = () => {
-  const sectionRef = React.useRef<HTMLElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
   const [usePixelFont, setUsePixelFont] = useState(true);
   const { activeProfile } = useCms();
+  const [isInView, setIsInView] = useState(false);
+  const [displayedText, setDisplayedText] = useState('');
+  
+  const fullText = activeProfile.description || '';
 
   // Track scroll progress of this section
   useSectionProgress(sectionRef, 'Operator Profile');
@@ -17,17 +24,39 @@ export const Chapter3Operator: React.FC = () => {
     setUsePixelFont(!usePixelFont);
   };
 
-  // Helper to split comma-separated items safely
-  const parseTags = (str: string) => {
-    if (!str) return [];
-    return str
-      .split(',')
-      .map((item) => item.trim())
-      .filter((item) => item.length > 0);
-  };
+  // Set up ScrollTrigger to detect when section comes into view
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
 
-  const skills = parseTags(activeProfile.skills);
-  const technologies = parseTags(activeProfile.technologies);
+    const trigger = ScrollTrigger.create({
+      trigger: section,
+      start: 'top 70%',
+      onEnter: () => setIsInView(true),
+      once: true,
+    });
+
+    return () => trigger.kill();
+  }, []);
+
+  // Typewriter effect triggered once scrolled into view
+  useEffect(() => {
+    if (!isInView) return;
+
+    let index = 0;
+    setDisplayedText('');
+
+    const interval = setInterval(() => {
+      if (index < fullText.length) {
+        setDisplayedText((prev) => prev + fullText[index]);
+        index++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 12); // Speed adjusted for organic cyber-dossier reading speed
+
+    return () => clearInterval(interval);
+  }, [isInView, fullText]);
 
   return (
     <section
@@ -96,37 +125,23 @@ export const Chapter3Operator: React.FC = () => {
             <span className={styles.readmeTab}>ARJUN_DOSSIER.md</span>
           </div>
           <div className={styles.readmeContent}>
-            <div className={styles.profileGrid}>
+            <div className={styles.briefingContainer}>
+              <h3 className={styles.briefingHeader}>
+                OPERATOR DOSSIER // SECURE TERMINAL
+              </h3>
+              <p className={styles.briefingSubtitle}>
+                &gt; {activeProfile.subtitle}
+              </p>
               
-              {/* Left Column: Avatar & Meta Data */}
-              <div className={styles.avatarColumn}>
-                <div className={styles.avatarWrapper}>
-                  {activeProfile.profileImage && (
-                    <ResolvedImage
-                      className={styles.avatarImg}
-                      srcPath={activeProfile.profileImage}
-                      alt={activeProfile.name}
-                      loading="lazy"
-                    />
-                  )}
-                </div>
-                
-                <div className={styles.metaInfo}>
-                  <div className={styles.metaRow}>
-                    <span className={styles.metaKey}>STT</span>
-                    <span className={styles.metaVal}>{activeProfile.status}</span>
-                  </div>
-                  <div className={styles.metaRow}>
-                    <span className={styles.metaKey}>EXP</span>
-                    <span className={styles.metaVal}>{activeProfile.experience}</span>
-                  </div>
-                  <div className={styles.metaRow}>
-                    <span className={styles.metaKey}>LOC</span>
-                    <span className={styles.metaVal}>{activeProfile.location}</span>
-                  </div>
-                </div>
+              <div className={styles.briefingDivider} />
+              
+              <p className={styles.briefingText}>
+                {displayedText}
+                <span className={styles.cursor}>_</span>
+              </p>
 
-                {activeProfile.resumeLink && activeProfile.resumeLink !== '#' && (
+              {activeProfile.resumeLink && activeProfile.resumeLink !== '#' && (
+                <div className={styles.actionContainer}>
                   <a
                     className={styles.resumeBtn}
                     href={activeProfile.resumeLink}
@@ -135,42 +150,8 @@ export const Chapter3Operator: React.FC = () => {
                   >
                     ACCESS RESUME
                   </a>
-                )}
-              </div>
-
-              {/* Right Column: Title, Subtitle, Bio & Tags */}
-              <div className={styles.detailsColumn}>
-                <h3 className={styles.dossierTitle}>{activeProfile.title}</h3>
-                <p className={styles.dossierSub}>&gt; {activeProfile.subtitle}</p>
-                <p className={styles.dossierDesc}>{activeProfile.description}</p>
-                
-                {skills.length > 0 && (
-                  <div className={styles.tagSection}>
-                    <div className={styles.tagHeader}>CORE_SKILLS</div>
-                    <div className={styles.tagContainer}>
-                      {skills.map((skill, index) => (
-                        <span key={index} className={styles.tag}>
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {technologies.length > 0 && (
-                  <div className={styles.tagSection}>
-                    <div className={styles.tagHeader}>TECH_STACK</div>
-                    <div className={styles.tagContainer}>
-                      {technologies.map((tech, index) => (
-                        <span key={index} className={styles.tag}>
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
+                </div>
+              )}
             </div>
           </div>
         </div>
