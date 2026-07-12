@@ -126,14 +126,7 @@ export const Chapter3Operator: React.FC = () => {
           </div>
           <div className={styles.readmeContent}>
             <div className={styles.briefingContainer}>
-              <h3 className={styles.briefingHeader}>
-                OPERATOR DOSSIER // SECURE TERMINAL
-              </h3>
-              <p className={styles.briefingSubtitle}>
-                &gt; {activeProfile.subtitle}
-              </p>
-              
-              <div className={styles.briefingDivider} />
+
               
               <p className={styles.briefingText}>
                 {displayedText}
