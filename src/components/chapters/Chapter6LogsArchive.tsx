@@ -575,7 +575,7 @@ export default function Chapter6LogsArchive() {
           </h3>
           <div ref={line2Ref} style={{ display: 'none' }} />
           <h3 ref={line3Ref} className={styles.line3}>
-            THEN YOU SHOULD MEET ME.
+            THEN WE SHOULD MEET.
           </h3>
         </div>
       </section>

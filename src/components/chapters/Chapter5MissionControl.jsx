@@ -65,6 +65,9 @@ export default function Chapter5MissionControl() {
 function BeltScene() {
   const { lenis } = useContext(AnimationContext);
   const { projects } = useCms();
+  const { width } = useViewport();
+  const isMobile = width < 768;
+  const trackVw = isMobile ? 260 : 340;
   const sectionRef = useRef(null);
   const trackRef = useRef(null);
   const gridRef = useRef(null);
@@ -214,7 +217,9 @@ function BeltScene() {
     start: 'top top',
     end: () => {
       const track = trackRef.current;
-      if (!track) return `+=${Math.round(window.innerWidth * (TRAVEL_VW / 100))}`;
+      const isMobileDevice = window.innerWidth < 768;
+      const fallbackTravelVw = isMobileDevice ? 160 : 240;
+      if (!track) return `+=${Math.round(window.innerWidth * (fallbackTravelVw / 100))}`;
       return `+=${Math.max(track.scrollWidth - window.innerWidth, 0)}`;
     },
     scrollTriggerConfig: {
@@ -378,9 +383,18 @@ function BeltScene() {
   /* ---- Flat horizontal slots layout matching the Wix Studio reference ---- */
   const slots = useMemo(() => {
     // 8 celestial bodies with decreased gaps and wave-like vertical alignment
-    const positions = [15, 55, 95, 135, 175, 215, 260, 310];
-    const sizes = [32, 10, 20, 30, 22, 32, 11, 34];
-    const verticalOffsets = [-7, 7, -7, 7, -7, 7, -7, 7];
+    const positions = isMobile 
+      ? [15, 45, 75, 105, 135, 165, 195, 225]
+      : [15, 55, 95, 135, 175, 215, 260, 310];
+      
+    const sizes = isMobile
+      ? [20, 7, 13, 19, 14, 20, 8, 22] // Reduced sizes for mobile
+      : [32, 10, 20, 30, 22, 32, 11, 34];
+      
+    const verticalOffsets = isMobile
+      ? [-4, 4, -4, 4, -4, 4, -4, 4] // Reduced vertical offsets
+      : [-7, 7, -7, 7, -7, 7, -7, 7];
+
     const desktopIds = [
       'rakshastra',
       'eznotes',
@@ -403,10 +417,10 @@ function BeltScene() {
         spinDur: 40 + (index * 7) % 31,
       };
     }).filter(Boolean);
-  }, [projects]);
+  }, [projects, isMobile]);
 
   // Ruler ticks: one every 4vw across the ruler strip.
-  const rulerWidthVw = TRACK_VW * GRID_PARALLAX + 100;
+  const rulerWidthVw = trackVw * GRID_PARALLAX + 100;
   const ticks = useMemo(
     () => Array.from({ length: Math.ceil(rulerWidthVw / 4) + 1 }, (_, i) => i),
     [rulerWidthVw]
@@ -735,7 +749,7 @@ function BeltScene() {
         <div
           ref={trackRef}
           className="c5-track"
-          style={{ width: `${TRACK_VW}vw`, zIndex: Z_INDEX.FOREGROUND }}
+          style={{ width: `${trackVw}vw`, zIndex: Z_INDEX.FOREGROUND }}
         >
           {slots.map(({ project: p, sizeVw, yOffVh, centerVw, spinDur }) => (
             <div
