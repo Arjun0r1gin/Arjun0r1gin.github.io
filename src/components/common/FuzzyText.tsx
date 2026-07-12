@@ -59,10 +59,19 @@ export const FuzzyText: React.FC<FuzzyTextProps> = ({
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
-      const computedFontFamily =
-        fontFamily === 'inherit' ? window.getComputedStyle(canvas).fontFamily || 'sans-serif' : fontFamily;
-      const fontSizeStr = typeof fontSize === 'number' ? `${fontSize}px` : fontSize;
-      const fontString = `${fontWeight} ${fontSizeStr} ${computedFontFamily}`;
+      // Let the browser resolve font properties natively
+      const computedStyle = window.getComputedStyle(canvas);
+      const computedFontFamily = computedStyle.fontFamily || 'sans-serif';
+      const computedFontWeight = computedStyle.fontWeight || '900';
+      
+      let numericFontSize = parseFloat(computedStyle.fontSize);
+      if (isNaN(numericFontSize) || numericFontSize <= 0) {
+        numericFontSize = 24; // Safe fallback
+      }
+
+      // Always pass a resolved px string to standard font descriptor checks
+      const fontSizeStr = `${numericFontSize}px`;
+      const fontString = `${computedFontWeight} ${fontSizeStr} ${computedFontFamily}`;
 
       try {
         await document.fonts.load(fontString);
@@ -72,24 +81,12 @@ export const FuzzyText: React.FC<FuzzyTextProps> = ({
 
       if (isCancelled) return;
 
-      let numericFontSize: number;
-      if (typeof fontSize === 'number') {
-        numericFontSize = fontSize;
-      } else {
-        const temp = document.createElement('span');
-        temp.style.fontSize = fontSize;
-        document.body.appendChild(temp);
-        const computedSize = window.getComputedStyle(temp).fontSize;
-        numericFontSize = parseFloat(computedSize);
-        document.body.removeChild(temp);
-      }
-
       const text = React.Children.toArray(children).join('');
       const offscreen = document.createElement('canvas');
       const offCtx = offscreen.getContext('2d');
       if (!offCtx) return;
 
-      offCtx.font = `${fontWeight} ${fontSizeStr} ${computedFontFamily}`;
+      offCtx.font = fontString;
       offCtx.textBaseline = 'alphabetic';
 
       let totalWidth = 0;
@@ -107,8 +104,13 @@ export const FuzzyText: React.FC<FuzzyTextProps> = ({
       const actualRight = letterSpacing !== 0 ? totalWidth : (metrics.actualBoundingBoxRight ?? metrics.width);
       const actualAscent = metrics.actualBoundingBoxAscent ?? numericFontSize;
       const actualDescent = metrics.actualBoundingBoxDescent ?? numericFontSize * 0.2;
-      const textBoundingWidth = Math.ceil(letterSpacing !== 0 ? totalWidth : actualLeft + actualRight);
-      const tightHeight = Math.ceil(actualAscent + actualDescent);
+      
+      let textBoundingWidth = Math.ceil(letterSpacing !== 0 ? totalWidth : actualLeft + actualRight);
+      let tightHeight = Math.ceil(actualAscent + actualDescent);
+
+      // Safe boundaries to prevent setting invalid canvas width/height
+      if (isNaN(textBoundingWidth) || textBoundingWidth <= 0) textBoundingWidth = 100;
+      if (isNaN(tightHeight) || tightHeight <= 0) tightHeight = 45;
 
       const extraWidthBuffer = 10;
       const offscreenWidth = textBoundingWidth + extraWidthBuffer;
@@ -117,7 +119,7 @@ export const FuzzyText: React.FC<FuzzyTextProps> = ({
 
       const xOffset = extraWidthBuffer / 2;
 
-      offCtx.font = `${fontWeight} ${fontSizeStr} ${computedFontFamily}`;
+      offCtx.font = fontString;
       offCtx.textBaseline = 'alphabetic';
 
       if (gradient && Array.isArray(gradient) && gradient.length >= 2) {
@@ -303,7 +305,17 @@ export const FuzzyText: React.FC<FuzzyTextProps> = ({
     };
   }, [children, fontSize, fontWeight, fontFamily, color, enableHover, baseIntensity, hoverIntensity, fuzzRange, fps, direction, transitionDuration, clickEffect, glitchMode, glitchInterval, glitchDuration, gradient, letterSpacing]);
 
-  return <canvas ref={canvasRef} className={className} />;
+  return (
+    <canvas 
+      ref={canvasRef} 
+      className={className} 
+      style={{ 
+        fontSize, 
+        fontWeight, 
+        fontFamily: fontFamily === 'inherit' ? undefined : fontFamily 
+      }} 
+    />
+  );
 };
 
 export default FuzzyText;
