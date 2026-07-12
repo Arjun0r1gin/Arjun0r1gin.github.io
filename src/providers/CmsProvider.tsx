@@ -67,6 +67,8 @@ const ACTIVE_PROFILE_ID_KEY = 'cosmos_cms_active_profile_id';
 const PROJECTS_KEY = 'cosmos_cms_projects';
 const DEVLOGS_KEY = 'cosmos_cms_devlogs';
 const CONTACTS_KEY = 'cosmos_cms_contacts';
+const PROFILES_VERSION_KEY = 'cosmos_cms_profiles_version';
+const PROFILES_VERSION = '3'; // Bump this whenever DEFAULT_PROFILES description changes
 
 const DEFAULT_PROFILES: ProfileData[] = [
   {
@@ -144,19 +146,29 @@ export const CmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // 1. Profiles & Active Profile ID
     const savedActiveId = localStorage.getItem(ACTIVE_PROFILE_ID_KEY);
     const savedProfiles = localStorage.getItem(PROFILES_LIST_KEY);
+    const savedVersion = localStorage.getItem(PROFILES_VERSION_KEY);
 
-    if (savedActiveId && savedProfiles) {
+    // Force-reset if version mismatch (description/defaults changed)
+    const isStale = savedVersion !== PROFILES_VERSION;
+
+    if (!isStale && savedActiveId && savedProfiles) {
       try {
         setProfilesState(JSON.parse(savedProfiles));
         setActiveProfileIdState(savedActiveId);
       } catch (e) {
         console.error('Failed to parse saved profiles data', e);
+        setProfilesState(DEFAULT_PROFILES);
+        setActiveProfileIdState('arjun-default');
+        localStorage.setItem(PROFILES_LIST_KEY, JSON.stringify(DEFAULT_PROFILES));
+        localStorage.setItem(ACTIVE_PROFILE_ID_KEY, 'arjun-default');
+        localStorage.setItem(PROFILES_VERSION_KEY, PROFILES_VERSION);
       }
     } else {
       setProfilesState(DEFAULT_PROFILES);
       setActiveProfileIdState('arjun-default');
       localStorage.setItem(PROFILES_LIST_KEY, JSON.stringify(DEFAULT_PROFILES));
       localStorage.setItem(ACTIVE_PROFILE_ID_KEY, 'arjun-default');
+      localStorage.setItem(PROFILES_VERSION_KEY, PROFILES_VERSION);
     }
 
     // 2. Projects

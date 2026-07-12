@@ -122,7 +122,7 @@ export const Chapter3Operator: React.FC = () => {
         {/* README.md File Box */}
         <div className={styles.readmeBox}>
           <div className={styles.readmeHeader}>
-            <span className={styles.readmeTab}>ARJUN_DOSSIER.md</span>
+            <span className={styles.readmeTab}>arjun0r1gin.md</span>
           </div>
           <div className={styles.readmeContent}>
             <div className={styles.briefingContainer}>
