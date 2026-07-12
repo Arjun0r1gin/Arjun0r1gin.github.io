@@ -142,6 +142,12 @@ code {
   opacity: 0.08; /* Subtle space dust texture */
   mix-blend-mode: color-dodge;
   z-index: -1;
+
+}
+
+@keyframes animStarScroll {
+  from { transform: translateY(0px); }
+  to { transform: translateY(-2000px); }
 }
 
 

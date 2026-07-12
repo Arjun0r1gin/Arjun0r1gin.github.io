@@ -40,8 +40,14 @@ export const ParallaxStars: React.FC<ParallaxStarsProps> = ({
 
   return (
     <div 
-      className="absolute inset-0 overflow-hidden pointer-events-none"
-      style={{ zIndex, opacity }}
+      style={{ 
+        position: 'absolute',
+        inset: 0,
+        overflow: 'hidden',
+        pointerEvents: 'none',
+        zIndex,
+        opacity 
+      }}
     >
       {/* Inline styles for infinite vertical scroll animations */}
       <style>{`
@@ -52,49 +58,85 @@ export const ParallaxStars: React.FC<ParallaxStarsProps> = ({
       `}</style>
 
       {/* Stars Layer 1 (Small / Far) */}
-      <div className="stars-parallax-far absolute inset-0">
+      <div className="stars-parallax-far" style={{ position: 'absolute', inset: 0 }}>
         <div 
-          className="absolute left-0 top-0 w-[1px] h-[1px] bg-transparent"
           style={{ 
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            width: '1px',
+            height: '1px',
+            backgroundColor: 'transparent',
             boxShadow: shadowsSmall,
             animation: `animStarScroll ${50 / speed}s linear infinite`
           }}
         >
           <div 
-            className="absolute top-[2000px] w-[1px] h-[1px] bg-transparent"
-            style={{ boxShadow: shadowsSmall }}
+            style={{ 
+              position: 'absolute',
+              left: 0,
+              top: '2000px',
+              width: '1px',
+              height: '1px',
+              backgroundColor: 'transparent',
+              boxShadow: shadowsSmall
+            }}
           />
         </div>
       </div>
 
       {/* Stars Layer 2 (Medium / Mid) */}
-      <div className="stars-parallax-mid absolute inset-0">
+      <div className="stars-parallax-mid" style={{ position: 'absolute', inset: 0 }}>
         <div 
-          className="absolute left-0 top-0 w-[2px] h-[2px] bg-transparent"
           style={{ 
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            width: '2px',
+            height: '2px',
+            backgroundColor: 'transparent',
             boxShadow: shadowsMedium,
             animation: `animStarScroll ${100 / speed}s linear infinite`
           }}
         >
           <div 
-            className="absolute top-[2000px] w-[2px] h-[2px] bg-transparent"
-            style={{ boxShadow: shadowsMedium }}
+            style={{ 
+              position: 'absolute',
+              left: 0,
+              top: '2000px',
+              width: '2px',
+              height: '2px',
+              backgroundColor: 'transparent',
+              boxShadow: shadowsMedium
+            }}
           />
         </div>
       </div>
 
       {/* Stars Layer 3 (Big / Near) */}
-      <div className="stars-parallax-near absolute inset-0">
+      <div className="stars-parallax-near" style={{ position: 'absolute', inset: 0 }}>
         <div 
-          className="absolute left-0 top-0 w-[3px] h-[3px] bg-transparent"
           style={{ 
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            width: '3px',
+            height: '3px',
+            backgroundColor: 'transparent',
             boxShadow: shadowsBig,
             animation: `animStarScroll ${150 / speed}s linear infinite`
           }}
         >
           <div 
-            className="absolute top-[2000px] w-[3px] h-[3px] bg-transparent"
-            style={{ boxShadow: shadowsBig }}
+            style={{ 
+              position: 'absolute',
+              left: 0,
+              top: '2000px',
+              width: '3px',
+              height: '3px',
+              backgroundColor: 'transparent',
+              boxShadow: shadowsBig
+            }}
           />
         </div>
       </div>
