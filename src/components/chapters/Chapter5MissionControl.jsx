@@ -332,22 +332,7 @@ function BeltScene() {
     };
   }, [timeline, triggerCategoryCrossfade, handleScrollUpdate]);
 
-  /* ---- Ambient motion: GPU-composited rotation tweens per planet ---- */
-  useEffect(() => {
-    const tweens = [];
-    spinTargets.current.forEach(({ el, spinDur }) => {
-      // GSAP handles RAF internally — no per-frame JS needed
-      const t = gsap.to(el, {
-        rotation: 360,
-        duration: spinDur,
-        ease: 'none',
-        repeat: -1,
-        overwrite: true,
-      });
-      tweens.push(t);
-    });
-    return () => tweens.forEach((t) => t.kill());
-  }, [slots]); // re-run only when slot list changes
+
 
   /* ---- Keyboard reachability: focusing an off-screen body advances ---- */
   const revealBody = (id) => {
@@ -420,6 +405,23 @@ function BeltScene() {
     () => Array.from({ length: Math.ceil(rulerWidthVw / 4) + 1 }, (_, i) => i),
     [rulerWidthVw]
   );
+
+  /* ---- Ambient motion: GPU-composited rotation tweens per planet ---- */
+  useEffect(() => {
+    const tweens = [];
+    spinTargets.current.forEach(({ el, spinDur }) => {
+      // GSAP handles RAF internally — no per-frame JS needed
+      const t = gsap.to(el, {
+        rotation: 360,
+        duration: spinDur,
+        ease: 'none',
+        repeat: -1,
+        overwrite: true,
+      });
+      tweens.push(t);
+    });
+    return () => tweens.forEach((t) => t.kill());
+  }, [slots]); // re-run only when slot list changes
 
   const sharedBodyProps = (p) => ({
     ref: (el) => {
