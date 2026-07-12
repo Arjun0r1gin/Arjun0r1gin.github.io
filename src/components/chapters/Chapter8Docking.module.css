@@ -457,6 +457,10 @@
    RESPONSIVE DESIGN (Mobile/Tablet Column Layout)
    ============================================================ */
 @media (max-width: 991px) {
+  .entities {
+    display: none !important;
+  }
+
   .section {
     padding: 60px 16px 140px;
   }
