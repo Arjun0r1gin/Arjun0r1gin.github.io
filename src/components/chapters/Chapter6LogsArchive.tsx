@@ -373,9 +373,13 @@ export default function Chapter6LogsArchive() {
         tl.to(header, { opacity: 0, duration: 0.3 }, '+=0.4');
 
         // 2. Typography fades in then out sequentially
-        gsap.set(line1, { opacity: 0, scale: 1, xPercent: 0, y: 0 });
-        tl.to(line1, { opacity: 1, duration: 0.8 });
-        tl.to(line1, { opacity: 0, duration: 0.5 }, '+=0.5');
+        gsap.set([line1, line3], { opacity: 0, scale: 1, xPercent: 0, y: 0 });
+        
+        tl.to(line1, { opacity: 1, duration: 0.6 });
+        tl.to(line1, { opacity: 0, duration: 0.4 }, '+=0.4');
+        
+        tl.to(line3, { opacity: 1, duration: 0.6 });
+        tl.to(line3, { opacity: 0, duration: 0.4 }, '+=0.4');
       }, section);
 
       return () => ctx.revert();
@@ -429,7 +433,7 @@ export default function Chapter6LogsArchive() {
       // 4. Initially set all elements (typography off-screen right, invisible by default to prevent overflow, overlay bg invisible)
       gsap.set(line1, { x: () => window.innerWidth, xPercent: 0, opacity: 0 });
       gsap.set(line2, { xPercent: 100, opacity: 0 });
-      gsap.set(line3, { xPercent: 100, opacity: 0, scale: 0.95, color: '#F8F8F8' });
+      gsap.set(line3, { xPercent: 100, scale: 0.95, color: '#F8F8F8', opacity: 0 });
       gsap.set(transitionBg, { opacity: 0, backgroundColor: '#F9F9F9' });
 
       // 5. ── PHASE 1: LINE 1 (SINGLE CONTINUOUS HORIZONTAL TEXT FLOW) ──
@@ -438,24 +442,40 @@ export default function Chapter6LogsArchive() {
       // Glides continuously across the screen from off-screen right (window.innerWidth) to off-screen left (-100%)
       tl.fromTo(line1,
         { x: () => window.innerWidth, xPercent: 0 },
-        { x: 0, xPercent: -100, ease: 'none', duration: 0.61 },
+        { x: 0, xPercent: -100, ease: 'none', duration: 0.48 },
         0.24
       );
       // Instantly hide Line 1 when it completes its exit
-      tl.set(line1, { opacity: 0 }, 0.85);
+      tl.set(line1, { opacity: 0 }, 0.72);
+
+      // 6. ── PHASE 2: LINE 3 (THEN YOU SHOULD MEET ME - LOCKED IN CENTER) ──
+      // Instantly make Line 3 visible at 0.62 progress (entering behind Line 1)
+      tl.set(line3, { opacity: 1 }, 0.62);
+      // Glides from off-screen right and settles at 0% (perfect center) by 0.78 progress
+      tl.fromTo(line3,
+        { xPercent: 100, scale: 0.95 },
+        { xPercent: 0, scale: 1.0, ease: 'none', duration: 0.16 },
+        0.62
+      );
+      // Holds Line 3 locked in center until unpinning (0.78 to 1.00)
+      // Instantly hide Line 3 when unpinning at 1.00 to prevent overflow into Chapter 8
+      tl.set(line3, { opacity: 0 }, 1.00);
 
       // 8. ── BACKGROUND & COLOR MORPH TRANSITIONS ──
-      // As the sentence glides past (around 0.60 progress), morph the background overlay
+      // As Line 1 is exiting and Line 3 is entering (around 0.62 progress), morph the background overlay
       // from transparent to solid white, and smoothly transition the text colors from white to black
-      // to maintain perfect readability.
       tl.fromTo(transitionBg,
         { opacity: 0, backgroundColor: '#F9F9F9' },
         { opacity: 1, ease: 'none', duration: 0.08 },
-        0.60
+        0.62
       );
       tl.to(line1,
         { color: '#111111', ease: 'none', duration: 0.08 },
-        0.60
+        0.62
+      );
+      tl.to(line3,
+        { color: '#111111', ease: 'none', duration: 0.08 },
+        0.62
       );
 
       // Transition the background color from white to mint teal (#9fd5ca) from 0.85 to 1.00 progress.
@@ -550,10 +570,12 @@ export default function Chapter6LogsArchive() {
         {/* Integrated Typography Overlay — fades in as asteroids exit */}
         <div ref={textContainerRef} className={styles.textContainer}>
           <h3 ref={line1Ref} className={`${styles.line} ${styles.line1}`}>
-            AND IF SOME IDEA EXCITES YOU, THAT DOESN'T LET YOU SLEEP, THEN WE SHOULD MEET.
+            AND IF SOME IDEA EXCITES YOU, THAT DOESN'T LET YOU SLEEP,
           </h3>
           <div ref={line2Ref} style={{ display: 'none' }} />
-          <div ref={line3Ref} style={{ display: 'none' }} />
+          <h3 ref={line3Ref} className={styles.line3}>
+            THEN YOU SHOULD MEET ME.
+          </h3>
         </div>
       </section>
 

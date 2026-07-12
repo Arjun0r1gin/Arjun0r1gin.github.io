@@ -399,10 +399,20 @@
 }
 
 .line3 {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: max-content;
+  transform: translate(-50%, -50%);
   font-size: clamp(1.7rem, 8.2vw, 8.2rem);
   color: #111111; /* Black text on white backdrop */
   font-weight: 900;
   letter-spacing: -0.04em;
+  opacity: 0;
+  white-space: nowrap;
+  text-transform: uppercase;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 .transitionBg {
