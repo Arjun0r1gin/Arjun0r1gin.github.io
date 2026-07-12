@@ -5,8 +5,6 @@ import { useAnimationReady } from '../../animations/hooks/useAnimationReady';
 import { useReducedMotion } from '../../animations/hooks/useReducedMotion';
 import styles from './Chapter1Initialize.module.css';
 import astronautImg from '../../assets/ui/astronaut.png';
-import { ParallaxStars } from '../common/ParallaxStars';
-import { FuzzyText } from '../common/FuzzyText';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -258,7 +256,6 @@ export default function Chapter1Initialize() {
           alt="Nebula Cloud 3"
           draggable="false"
         />
-        <ParallaxStars speed={0.6} zIndex={1} opacity={0.45} />
       </div>
 
       <div ref={contentWrapperRef} className={styles.contentWrapper}>
@@ -302,39 +299,9 @@ export default function Chapter1Initialize() {
         <div ref={heroContentRef} className={styles.heroContent}>
           <div className={styles.titleContainer}>
             <h1 className={styles.name}>
-              <span className={styles.titleWord}>
-                <FuzzyText
-                  fontSize="clamp(3.5rem, 7.8vw, 8.5rem)"
-                  fontWeight={200}
-                  fontFamily="'Outfit', sans-serif"
-                  color="#ffffff"
-                  baseIntensity={0.12}
-                  hoverIntensity={0.4}
-                  fuzzRange={12}
-                  clickEffect={true}
-                  transitionDuration={150}
-                  direction="both"
-                >
-                  ARJUN
-                </FuzzyText>
-              </span>
+              <span className={styles.titleWord}>ARJUN</span>
               <span className={styles.titleGap}></span>
-              <span className={styles.titleWord}>
-                <FuzzyText
-                  fontSize="clamp(3.5rem, 7.8vw, 8.5rem)"
-                  fontWeight={200}
-                  fontFamily="'Outfit', sans-serif"
-                  color="#ffffff"
-                  baseIntensity={0.12}
-                  hoverIntensity={0.4}
-                  fuzzRange={12}
-                  clickEffect={true}
-                  transitionDuration={150}
-                  direction="both"
-                >
-                  V
-                </FuzzyText>
-              </span>
+              <span className={styles.titleWord}>V</span>
             </h1>
           </div>
         </div>
