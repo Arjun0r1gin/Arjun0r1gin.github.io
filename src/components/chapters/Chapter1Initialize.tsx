@@ -5,6 +5,7 @@ import { useAnimationReady } from '../../animations/hooks/useAnimationReady';
 import { useReducedMotion } from '../../animations/hooks/useReducedMotion';
 import styles from './Chapter1Initialize.module.css';
 import astronautImg from '../../assets/ui/astronaut.png';
+import { ParallaxStars } from '../common/ParallaxStars';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -256,7 +257,7 @@ export default function Chapter1Initialize() {
           alt="Nebula Cloud 3"
           draggable="false"
         />
-        <div className={styles.starsOverlay}></div>
+        <ParallaxStars speed={0.6} zIndex={1} opacity={0.45} />
       </div>
 
       <div ref={contentWrapperRef} className={styles.contentWrapper}>

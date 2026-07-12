@@ -10,6 +10,7 @@ import { Z_INDEX } from '../../animations/constants';
 import { AnimationContext } from '../../providers/AnimationProvider';
 import { useCms } from '../../providers/CmsProvider';
 import ResolvedImage from '../common/ResolvedImage';
+import { ParallaxStars } from '../common/ParallaxStars';
 import './chapter5-mission-control.css';
 
 /* ------------------------------------------------------------------ *
@@ -640,9 +641,8 @@ function BeltScene() {
           style={{ width: `${rulerWidthVw}vw`, zIndex: Z_INDEX.BACKGROUND }}
           aria-hidden="true"
         >
-          {/* Twinkling alternatively background stars */}
-          <div className="cosmos-universe-stars-a" style={{ pointerEvents: 'none', position: 'absolute', inset: 0 }} />
-          <div className="cosmos-universe-stars-b" style={{ pointerEvents: 'none', position: 'absolute', inset: 0 }} />
+          {/* Parallax stars scrolling background */}
+          <ParallaxStars speed={0.5} zIndex={1} opacity={0.9} />
           <div className="c5-grid-3d" />
         </div>
 

@@ -8,13 +8,15 @@ import Chapter3Operator from './components/chapters/Chapter3Operator';
 import Chapter5MissionControl from './components/chapters/Chapter5MissionControl';
 import Chapter6LogsArchive from './components/chapters/Chapter6LogsArchive';
 import Chapter8Docking from './components/chapters/Chapter8Docking';
+import { ParallaxStars } from './components/common/ParallaxStars';
 
 function App() {
   useEffect(() => {
-    const starsA = document.querySelector('.cosmos-universe-stars-a');
-    const starsB = document.querySelector('.cosmos-universe-stars-b');
+    const starsA = document.querySelector('.stars-parallax-far');
+    const starsB = document.querySelector('.stars-parallax-mid');
+    const starsC = document.querySelector('.stars-parallax-near');
     const dust = document.querySelector('.cosmos-universe-dust');
-    if (!starsA && !starsB && !dust) return;
+    if (!starsA && !starsB && !starsC && !dust) return;
 
     const ctx = gsap.context(() => {
       // Gentle vertical parallax drift relative to the scroll of the entire cosmic section
@@ -42,9 +44,21 @@ function App() {
           }
         });
       }
+      if (starsC) {
+        gsap.to(starsC, {
+          y: '-50px',
+          ease: 'none',
+          scrollTrigger: {
+            trigger: '.cosmos-universe-theme',
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true,
+          }
+        });
+      }
       if (dust) {
         gsap.to(dust, {
-          y: '-50px',
+          y: '-30px',
           ease: 'none',
           scrollTrigger: {
             trigger: '.cosmos-universe-theme',
@@ -75,10 +89,7 @@ function App() {
       <div className="cosmos-universe-theme">
         {/* Fixed high-performance cosmic backdrop */}
         <div className="cosmos-universe-bg">
-          {/* Star Layer A (Twinkling alternatively) */}
-          <div className="cosmos-universe-stars-a" />
-          {/* Star Layer B (Twinkling alternatively) */}
-          <div className="cosmos-universe-stars-b" />
+          <ParallaxStars speed={0.8} zIndex={1} opacity={0.9} />
           {/* Ambient cosmic dust overlay */}
           <div className="cosmos-universe-dust" />
         </div>
