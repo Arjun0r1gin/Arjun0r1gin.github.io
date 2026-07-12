@@ -8,7 +8,6 @@ import Chapter3Operator from './components/chapters/Chapter3Operator';
 import Chapter5MissionControl from './components/chapters/Chapter5MissionControl';
 import Chapter6LogsArchive from './components/chapters/Chapter6LogsArchive';
 import Chapter8Docking from './components/chapters/Chapter8Docking';
-import Chapter7Ticker from './components/chapters/Chapter7Ticker';
 import { ParallaxStars } from './components/common/ParallaxStars';
 import { FuzzyText } from './components/common/FuzzyText';
 
@@ -129,11 +128,6 @@ function App() {
         {/* Chapter 6: Logs Archive — parallax asteroid field */}
         <div style={{ width: '100%', position: 'relative', zIndex: 1 }}>
           <Chapter6LogsArchive />
-        </div>
-
-        {/* Chapter 7: Ticker tape text scroll ribbon */}
-        <div style={{ width: '100%', position: 'relative', zIndex: 3 }}>
-          <Chapter7Ticker />
         </div>
 
         {/* Chapter 8: Docking Station — Connection */}
