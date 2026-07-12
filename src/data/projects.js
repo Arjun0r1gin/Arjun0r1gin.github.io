@@ -1,23 +1,23 @@
 export const projects = [
   {
     id: 'rakshastra',
-    name: 'RAKSHASTRA v3.0',
+    name: 'RAKSHASTRA',
     size: 'flagship',
     accentColor: 'var(--signal-teal)',
     blurb:
       'Satellite ground-segment cyber defense system using real TLE orbital data, a from-scratch SGP4 propagator, and per-satellite ML anomaly detection.',
-    githubUrl: '#',
+    githubUrl: 'https://github.com/Arjun0r1gin/RAKSHASTRA',
     imagePath: '/src/assets/planets/rakshastra.png',
   },
   {
     id: 'eznotes',
-    name: 'EZ Notes 2.0',
+    name: 'EZ Notes',
     size: 'moon',
     orbitsParentId: 'rakshastra',
     accentColor: 'var(--signal-teal)',
     blurb:
       'Deployed note-taking PWA with Gemini API integration for summarization and recall — shipped, installable, with real daily users.',
-    githubUrl: '#',
+    githubUrl: 'https://github.com/Arjun0r1gin/EZ-NOTES',
     imagePath: '/src/assets/planets/eznotes.png',
   },
   {
@@ -27,7 +27,7 @@ export const projects = [
     accentColor: 'var(--ember)',
     blurb:
       'CanSat flight software for the IN-SPACe Student CanSat Program — telemetry, state machines, and recovery logic validated through Preliminary Design Review.',
-    githubUrl: '#',
+    githubUrl: 'https://github.com/Arjun0r1gin/EP-SAT',
     imagePath: '/src/assets/planets/epsat.png',
   },
   {
@@ -37,7 +37,7 @@ export const projects = [
     accentColor: 'var(--signal-teal)',
     blurb:
       'Multi-phase SOC simulation platform: staged attack scenarios, live log pipelines, and analyst triage workflows for blue-team training.',
-    githubUrl: '#',
+    githubUrl: 'https://github.com/Arjun0r1gin/CyberLab',
     imagePath: '/src/assets/planets/cyberlab.png',
   },
   {

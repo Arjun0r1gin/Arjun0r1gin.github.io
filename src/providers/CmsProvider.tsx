@@ -67,8 +67,12 @@ const ACTIVE_PROFILE_ID_KEY = 'cosmos_cms_active_profile_id';
 const PROJECTS_KEY = 'cosmos_cms_projects';
 const DEVLOGS_KEY = 'cosmos_cms_devlogs';
 const CONTACTS_KEY = 'cosmos_cms_contacts';
+
 const PROFILES_VERSION_KEY = 'cosmos_cms_profiles_version';
 const PROFILES_VERSION = '4'; // Bump this whenever DEFAULT_PROFILES description changes
+
+const PROJECTS_VERSION_KEY = 'cosmos_cms_projects_version';
+const PROJECTS_VERSION = '1'; // Bump this whenever initialProjects default data changes
 
 const DEFAULT_PROFILES: ProfileData[] = [
   {
@@ -173,16 +177,24 @@ export const CmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     // 2. Projects
     const savedProjects = localStorage.getItem(PROJECTS_KEY);
-    if (savedProjects) {
+    const savedProjectsVersion = localStorage.getItem(PROJECTS_VERSION_KEY);
+    const isProjectsStale = savedProjectsVersion !== PROJECTS_VERSION;
+
+    if (!isProjectsStale && savedProjects) {
       try {
         setProjectsState(JSON.parse(savedProjects));
       } catch (e) {
         console.error('Failed to parse saved projects', e);
+        const castProjects = initialProjects as ProjectData[];
+        setProjectsState(castProjects);
+        localStorage.setItem(PROJECTS_KEY, JSON.stringify(castProjects));
+        localStorage.setItem(PROJECTS_VERSION_KEY, PROJECTS_VERSION);
       }
     } else {
       const castProjects = initialProjects as ProjectData[];
       setProjectsState(castProjects);
       localStorage.setItem(PROJECTS_KEY, JSON.stringify(castProjects));
+      localStorage.setItem(PROJECTS_VERSION_KEY, PROJECTS_VERSION);
     }
 
     // 3. DevLogs
