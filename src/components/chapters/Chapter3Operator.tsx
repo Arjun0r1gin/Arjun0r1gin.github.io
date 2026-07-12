@@ -24,6 +24,12 @@ export const Chapter3Operator: React.FC = () => {
     setUsePixelFont(!usePixelFont);
   };
 
+  // Stable ref for typewriter state — avoids StrictMode double-render race condition
+  const typewriterRef = useRef<{ interval: ReturnType<typeof setInterval> | null; index: number }>({
+    interval: null,
+    index: 0,
+  });
+
   // Set up ScrollTrigger to detect when section comes into view
   useEffect(() => {
     const section = sectionRef.current;
@@ -39,23 +45,37 @@ export const Chapter3Operator: React.FC = () => {
     return () => trigger.kill();
   }, []);
 
-  // Typewriter effect triggered once scrolled into view
+  // Typewriter effect — StrictMode-safe via ref-tracked index
   useEffect(() => {
-    if (!isInView) return;
+    if (!isInView || !fullText) return;
 
-    let index = 0;
+    const state = typewriterRef.current;
+
+    // Always cancel any previous running interval before starting fresh
+    if (state.interval) {
+      clearInterval(state.interval);
+      state.interval = null;
+    }
+    state.index = 0;
     setDisplayedText('');
 
-    const interval = setInterval(() => {
-      if (index < fullText.length) {
-        setDisplayedText((prev) => prev + fullText[index]);
-        index++;
+    state.interval = setInterval(() => {
+      if (state.index < fullText.length) {
+        const char = fullText[state.index];
+        state.index++;
+        setDisplayedText((prev) => prev + char);
       } else {
-        clearInterval(interval);
+        clearInterval(state.interval!);
+        state.interval = null;
       }
-    }, 12); // Speed adjusted for organic cyber-dossier reading speed
+    }, 14);
 
-    return () => clearInterval(interval);
+    return () => {
+      if (state.interval) {
+        clearInterval(state.interval);
+        state.interval = null;
+      }
+    };
   }, [isInView, fullText]);
 
   return (

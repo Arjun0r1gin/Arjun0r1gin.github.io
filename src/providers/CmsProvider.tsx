@@ -68,7 +68,7 @@ const PROJECTS_KEY = 'cosmos_cms_projects';
 const DEVLOGS_KEY = 'cosmos_cms_devlogs';
 const CONTACTS_KEY = 'cosmos_cms_contacts';
 const PROFILES_VERSION_KEY = 'cosmos_cms_profiles_version';
-const PROFILES_VERSION = '3'; // Bump this whenever DEFAULT_PROFILES description changes
+const PROFILES_VERSION = '4'; // Bump this whenever DEFAULT_PROFILES description changes
 
 const DEFAULT_PROFILES: ProfileData[] = [
   {
