@@ -14,6 +14,7 @@
   box-sizing: border-box;
   overflow-x: hidden;
   transition: font-family 0.15s ease;
+  margin-top: -1px; /* Overlap with Chapter 2 to eliminate subpixel gap lines */
 }
 
 /* Font Variables Toggled by State */
