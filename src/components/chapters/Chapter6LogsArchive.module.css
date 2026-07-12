@@ -374,11 +374,9 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
+  width: max-content;
   transform: translateY(-50%);
   margin: 0;
-  padding: 0 4vw;
-  box-sizing: border-box;
   font-weight: 800;
   text-transform: uppercase;
   line-height: 1.15;

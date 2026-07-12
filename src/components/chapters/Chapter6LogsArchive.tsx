@@ -427,7 +427,7 @@ export default function Chapter6LogsArchive() {
       );
 
       // 4. Initially set all elements (typography off-screen right, invisible by default to prevent overflow, overlay bg invisible)
-      gsap.set(line1, { xPercent: 100, opacity: 0 });
+      gsap.set(line1, { x: () => window.innerWidth, xPercent: 0, opacity: 0 });
       gsap.set(line2, { xPercent: 100, opacity: 0 });
       gsap.set(line3, { xPercent: 100, opacity: 0, scale: 0.95, color: '#F8F8F8' });
       gsap.set(transitionBg, { opacity: 0, backgroundColor: '#F9F9F9' });
@@ -435,10 +435,10 @@ export default function Chapter6LogsArchive() {
       // 5. ── PHASE 1: LINE 1 (SINGLE CONTINUOUS HORIZONTAL TEXT FLOW) ──
       // Instantly make Line 1 visible at start of Phase 1 (0.24)
       tl.set(line1, { opacity: 1 }, 0.24);
-      // Glides continuously across the screen from 100% (right) to -135% (left) from 0.24 to 0.85 progress
+      // Glides continuously across the screen from off-screen right (window.innerWidth) to off-screen left (-100%)
       tl.fromTo(line1,
-        { xPercent: 100 },
-        { xPercent: -135, ease: 'none', duration: 0.61 },
+        { x: () => window.innerWidth, xPercent: 0 },
+        { x: 0, xPercent: -100, ease: 'none', duration: 0.61 },
         0.24
       );
       // Instantly hide Line 1 when it completes its exit
