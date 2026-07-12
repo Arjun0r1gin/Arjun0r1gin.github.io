@@ -47,10 +47,22 @@ export const Chapter3Operator: React.FC = () => {
         Switch Font
       </button>
 
-      {/* Profile Header */}
       <div className={styles.headerContainer}>
-        <h2 className={styles.name}>
-          <span className={styles.floatText}>{activeProfile.name}</span>
+        <h2 className={styles.name} style={{ display: 'flex', justifyContent: 'center' }}>
+          <FuzzyText
+            fontSize="clamp(24px, 4.8vw, 52px)"
+            fontWeight="normal"
+            fontFamily="inherit"
+            color="#ffffff"
+            baseIntensity={0.12}
+            hoverIntensity={0.4}
+            fuzzRange={10}
+            clickEffect={true}
+            transitionDuration={150}
+            direction="both"
+          >
+            {activeProfile.name}
+          </FuzzyText>
         </h2>
         <p className={styles.tagline}>
           <span className={styles.floatTextSecondary}>{activeProfile.subtitle}</span>
