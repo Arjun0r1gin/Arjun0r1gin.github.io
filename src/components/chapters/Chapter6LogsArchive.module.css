@@ -398,12 +398,6 @@
   font-size: clamp(2.2rem, 11vw, 7.8rem);
   color: #F8F8F8; /* White text on black space */
   text-shadow: 0 8px 30px rgba(0, 0, 0, 0.7), 0 2px 8px rgba(0, 0, 0, 0.4);
-  line-height: 1.2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  white-space: nowrap;
-  gap: 1.2vh;
 }
 
 .line3 {

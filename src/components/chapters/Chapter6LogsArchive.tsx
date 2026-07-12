@@ -579,10 +579,7 @@ export default function Chapter6LogsArchive() {
         {/* Integrated Typography Overlay — fades in as asteroids exit */}
         <div ref={textContainerRef} className={styles.textContainer}>
           <h3 ref={line1Ref} className={`${styles.line} ${styles.line1}`}>AND IF SOME IDEA</h3>
-          <div ref={line2Ref} className={`${styles.line} ${styles.line2}`}>
-            <div>EXCITES YOU</div>
-            <div>THAT DOESN'T LET YOU SLEEP,</div>
-          </div>
+          <h3 ref={line2Ref} className={`${styles.line} ${styles.line2}`}>EXCITES YOU, THAT DOESN'T LET YOU SLEEP,</h3>
           <h3 ref={line3Ref} className={`${styles.line} ${styles.line3}`}>THEN WE SHOULD MEET.</h3>
         </div>
       </section>
