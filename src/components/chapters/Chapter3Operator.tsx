@@ -101,7 +101,7 @@ export const Chapter3Operator: React.FC = () => {
           <FuzzyText
             fontSize="clamp(24px, 4.8vw, 52px)"
             fontWeight="normal"
-            fontFamily="inherit"
+            fontFamily={usePixelFont ? "'Press Start 2P', monospace" : "'Share Tech Mono', monospace"}
             color="#ffffff"
             baseIntensity={0.12}
             hoverIntensity={0.4}
@@ -125,7 +125,7 @@ export const Chapter3Operator: React.FC = () => {
           <FuzzyText
             fontSize="clamp(18px, 2.5vw, 24px)"
             fontWeight="normal"
-            fontFamily="'Rubik Glitch', system-ui"
+            fontFamily={usePixelFont ? "'Rubik Glitch', system-ui" : "'Share Tech Mono', monospace"}
             color="#00ff00"
             baseIntensity={0.18}
             hoverIntensity={0.5}
