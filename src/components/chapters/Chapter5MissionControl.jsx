@@ -388,7 +388,7 @@ function BeltScene() {
       : [15, 55, 95, 135, 175, 215, 260, 310];
       
     const sizes = isMobile
-      ? [20, 7, 13, 19, 14, 20, 8, 22] // Reduced sizes for mobile
+      ? [26, 10, 17, 25, 19, 26, 11, 29] // Increased sizes for mobile (~30% larger)
       : [32, 10, 20, 30, 22, 32, 11, 34];
       
     const verticalOffsets = isMobile
