@@ -211,6 +211,37 @@ export const CmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, []);
 
+  // Listen for localStorage changes from other tabs/windows
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (!e.newValue) return;
+      try {
+        switch (e.key) {
+          case PROFILES_LIST_KEY:
+            setProfilesState(JSON.parse(e.newValue));
+            break;
+          case ACTIVE_PROFILE_ID_KEY:
+            setActiveProfileIdState(e.newValue);
+            break;
+          case PROJECTS_KEY:
+            setProjectsState(JSON.parse(e.newValue));
+            break;
+          case DEVLOGS_KEY:
+            setDevlogsState(JSON.parse(e.newValue));
+            break;
+          case CONTACTS_KEY:
+            setContactsState(JSON.parse(e.newValue));
+            break;
+        }
+      } catch (err) {
+        console.error(`Failed to parse updated storage data for ${e.key}`, err);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
   // Get current active profile
   const activeProfile = profiles.find((p) => p.id === activeProfileId) || DEFAULT_PROFILES[0];
 

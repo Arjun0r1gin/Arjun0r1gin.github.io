@@ -58,7 +58,7 @@ export const usePinnedTimeline = (
       scrollTrigger: {
         trigger: element,
         pin: true,
-        scrub: true,
+        scrub: 0.8, // Smoothing factor for buttery scroll tracking
         start: startRef.current ?? 'top top',
         end:   endRef.current   ?? 'bottom top',
         invalidateOnRefresh: true,

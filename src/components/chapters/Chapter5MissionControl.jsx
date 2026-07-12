@@ -182,28 +182,17 @@ function BeltScene() {
     }
   }, []);
 
+  // Throttled scroll update — only calls getBoundingClientRect when needed
+  // by tracking which planet index is closest via the scroll progress ratio.
   const handleScrollUpdate = useCallback((self) => {
-    const track = trackRef.current;
-    if (!track) return;
-    const bodies = track.querySelectorAll('.c5-body');
-    if (!bodies.length) return;
-
-    let closestIndex = 0;
-    let minDistance = Infinity;
-    const centerX = window.innerWidth / 2;
-
-    bodies.forEach((body, index) => {
-      const rect = body.getBoundingClientRect();
-      const bodyCenterX = rect.left + rect.width / 2;
-      const distance = Math.abs(bodyCenterX - centerX);
-      if (distance < minDistance) {
-        minDistance = distance;
-        closestIndex = index;
-      }
-    });
-
+    const progress = self.progress;
+    // 8 slots: first 6 = software, last 2 = hardware
+    const totalSlots = 8;
+    const closestIndex = Math.min(
+      Math.round(progress * (totalSlots - 1)),
+      totalSlots - 1
+    );
     const activeCategory = closestIndex <= 5 ? 'software' : 'hardware';
-
     if (currentCategoryRef.current !== activeCategory) {
       currentCategoryRef.current = activeCategory;
       triggerCategoryCrossfade(activeCategory);
@@ -343,16 +332,22 @@ function BeltScene() {
     };
   }, [timeline, triggerCategoryCrossfade, handleScrollUpdate]);
 
-  /* ---- Ambient motion: shared gsap.ticker (scroll-independent) ---- */
+  /* ---- Ambient motion: GPU-composited rotation tweens per planet ---- */
   useEffect(() => {
-    const tick = (time) => {
-      spinTargets.current.forEach(({ el, spinDur }) => {
-        gsap.set(el, { rotation: ((time * 360) / spinDur) % 360 });
+    const tweens = [];
+    spinTargets.current.forEach(({ el, spinDur }) => {
+      // GSAP handles RAF internally — no per-frame JS needed
+      const t = gsap.to(el, {
+        rotation: 360,
+        duration: spinDur,
+        ease: 'none',
+        repeat: -1,
+        overwrite: true,
       });
-    };
-    gsap.ticker.add(tick);
-    return () => gsap.ticker.remove(tick); // clean up ticker callback on unmount
-  }, []);
+      tweens.push(t);
+    });
+    return () => tweens.forEach((t) => t.kill());
+  }, [slots]); // re-run only when slot list changes
 
   /* ---- Keyboard reachability: focusing an off-screen body advances ---- */
   const revealBody = (id) => {
