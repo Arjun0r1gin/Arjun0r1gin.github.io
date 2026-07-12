@@ -63,23 +63,23 @@ export const projects = [
   },
   {
     id: 'telemetry-db',
-    name: 'TelemetryDB',
+    name: 'MIDI-THEREMIN',
     size: 'moon',
     orbitsParentId: 'cyberlab',
     accentColor: 'var(--signal-teal)',
     blurb:
-      'High-performance time-series database optimized for logging CanSat telemetry and tracking flight status variables in real-time.',
-    githubUrl: '#',
+      'MIDI - THEREMIN\nA gesture-controlled, contact-free MIDI controller. Move your hands in the air, an Arduino tracks them with ultrasonic sensors, and the result comes out as real MIDI playable through any DAW, on any virtual instrument.',
+    githubUrl: 'https://github.com/Arjun0r1gin/MIDI-THEREMIN',
     imagePath: '/src/assets/planets/eznotes.png',
   },
   {
     id: 'payload-triage',
-    name: 'PayloadTriage',
+    name: 'JALTANTRA',
     size: 'flagship',
     accentColor: 'var(--signal-teal)',
     blurb:
-      'Command-line validation tool ensuring the payload integrity of spacecraft commands before upload transmission.',
-    githubUrl: '#',
+      'jaltantra is an IoT + AI powered smart irrigation system designed to optimise water usage in agriculture.\nIt predicts rainfall, monitors soil and water levels, and automates irrigation decisions in real-time.',
+    githubUrl: 'https://github.com/Scam0p/JalaTantra',
     imagePath: '/src/assets/planets/rakshastra.png',
   },
 ];

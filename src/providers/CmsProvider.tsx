@@ -72,7 +72,10 @@ const PROFILES_VERSION_KEY = 'cosmos_cms_profiles_version';
 const PROFILES_VERSION = '4'; // Bump this whenever DEFAULT_PROFILES description changes
 
 const PROJECTS_VERSION_KEY = 'cosmos_cms_projects_version';
-const PROJECTS_VERSION = '1'; // Bump this whenever initialProjects default data changes
+const PROJECTS_VERSION = '2'; // Bumped for MIDI-THEREMIN & JALTANTRA
+
+const CONTACTS_VERSION_KEY = 'cosmos_cms_contacts_version';
+const CONTACTS_VERSION = '1'; // Bump this whenever DEFAULT_CONTACTS changes
 
 const DEFAULT_PROFILES: ProfileData[] = [
   {
@@ -108,31 +111,31 @@ const DEFAULT_PROFILES: ProfileData[] = [
 const DEFAULT_CONTACTS: ContactLink[] = [
   {
     id: 'email',
-    name: 'Email',
-    href: 'mailto:arjun.v@example.com',
+    name: 'Email Port',
+    href: 'mailto:arjunvijayakumar1122@gmail.com',
     label: 'Establish direct secure email transmission'
   },
   {
     id: 'linkedin',
-    name: 'LinkedIn',
-    href: '#',
+    name: 'LinkedIn Port',
+    href: 'https://www.linkedin.com/in/arjun-v-037627315/',
     label: 'Establish connection via LinkedIn'
   },
   {
     id: 'instagram',
-    name: 'Instagram',
-    href: '#',
+    name: 'Instagram Port',
+    href: 'https://www.instagram.com/arjunnaano/',
     label: 'Establish connection via Instagram'
   },
   {
     id: 'github',
-    name: 'GitHub',
+    name: 'GitHub Port',
     href: 'https://github.com/Arjun0r1gin',
     label: 'Explore engineering archive on GitHub'
   },
   {
     id: 'x',
-    name: 'X',
+    name: 'X Port',
     href: '#',
     label: 'Establish connection via X'
   }
@@ -212,14 +215,22 @@ export const CmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     // 4. Contacts
     const savedContacts = localStorage.getItem(CONTACTS_KEY);
-    if (savedContacts) {
+    const savedContactsVersion = localStorage.getItem(CONTACTS_VERSION_KEY);
+    const isContactsStale = savedContactsVersion !== CONTACTS_VERSION;
+
+    if (!isContactsStale && savedContacts) {
       try {
         setContactsState(JSON.parse(savedContacts));
       } catch (e) {
         console.error('Failed to parse saved contacts', e);
+        setContactsState(DEFAULT_CONTACTS);
+        localStorage.setItem(CONTACTS_KEY, JSON.stringify(DEFAULT_CONTACTS));
+        localStorage.setItem(CONTACTS_VERSION_KEY, CONTACTS_VERSION);
       }
     } else {
+      setContactsState(DEFAULT_CONTACTS);
       localStorage.setItem(CONTACTS_KEY, JSON.stringify(DEFAULT_CONTACTS));
+      localStorage.setItem(CONTACTS_VERSION_KEY, CONTACTS_VERSION);
     }
   }, []);
 
