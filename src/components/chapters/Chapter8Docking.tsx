@@ -7,6 +7,7 @@ import { useAnimationReady } from '../../animations/hooks/useAnimationReady';
 import styles from './Chapter8Docking.module.css';
 import ufoImg from '../../assets/ui/ufo.png';
 import { useCms } from '../../providers/CmsProvider';
+import { FuzzyText } from '../common/FuzzyText';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -270,8 +271,21 @@ export const Chapter8Docking: React.FC = () => {
 
       {/* 4. Main page headings, links, and UFO interactions (floats on top) */}
       <div className={styles.container}>
-        <h2 ref={headingRef} className={styles.missionComplete}>
-          <span className={styles.floatHeading}>MISSION COMPLETE</span>
+        <h2 ref={headingRef} className={styles.missionComplete} style={{ display: 'flex', justifyContent: 'center' }}>
+          <FuzzyText
+            fontSize="clamp(24px, 4.5vw, 42px)"
+            fontWeight={300}
+            fontFamily="'Rubik Glitch', system-ui"
+            color="#000000"
+            baseIntensity={0.15}
+            hoverIntensity={0.5}
+            fuzzRange={8}
+            clickEffect={true}
+            transitionDuration={150}
+            direction="both"
+          >
+            MISSION COMPLETE
+          </FuzzyText>
         </h2>
         <p ref={subTitleRef} className={styles.subTitle}>
           <span className={styles.floatSub}>Docking Station Online / Secure Links Established</span>

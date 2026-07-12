@@ -9,6 +9,7 @@ import Chapter5MissionControl from './components/chapters/Chapter5MissionControl
 import Chapter6LogsArchive from './components/chapters/Chapter6LogsArchive';
 import Chapter8Docking from './components/chapters/Chapter8Docking';
 import { ParallaxStars } from './components/common/ParallaxStars';
+import { FuzzyText } from './components/common/FuzzyText';
 
 function App() {
   useEffect(() => {
@@ -100,15 +101,22 @@ function App() {
         </div>
 
         {/* Cinematic spacing buffer between profile console and planets grid */}
-        <div style={{ height: '40vh', background: 'linear-gradient(to bottom, #000000 0%, #10211e 100%)', position: 'relative', zIndex: 3 }}>
-          <h2 className="c5-title" style={{ bottom: '18vh', top: 'auto', position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
-            {"PUBLIC PROJECTS".split("").map((char, index) => (
-              <span key={index} className="c5-title-letter">
-                <span className="c5-title-letter-float">
-                  {char === " " ? "\u00A0" : char}
-                </span>
-              </span>
-            ))}
+        <div style={{ height: '40vh', background: 'linear-gradient(to bottom, #000000 0%, #10211e 100%)', position: 'relative', zIndex: 3, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingBottom: '18vh', boxSizing: 'border-box' }}>
+          <h2 className="c5-title" style={{ margin: 0, display: 'flex', justifyContent: 'center', pointerEvents: 'auto' }}>
+            <FuzzyText
+              fontSize="clamp(2.5rem, 8vw, 5.5rem)"
+              fontWeight={900}
+              fontFamily="'Outfit', sans-serif"
+              color="#ffffff"
+              baseIntensity={0.15}
+              hoverIntensity={0.5}
+              fuzzRange={15}
+              clickEffect={true}
+              transitionDuration={200}
+              direction="both"
+            >
+              PUBLIC PROJECTS
+            </FuzzyText>
           </h2>
         </div>
 

@@ -11,6 +11,7 @@ import { AnimationContext } from '../../providers/AnimationProvider';
 import { useCms } from '../../providers/CmsProvider';
 import ResolvedImage from '../common/ResolvedImage';
 import { ParallaxStars } from '../common/ParallaxStars';
+import { FuzzyText } from '../common/FuzzyText';
 import './chapter5-mission-control.css';
 
 /* ------------------------------------------------------------------ *
@@ -298,33 +299,28 @@ function BeltScene() {
       0.5
     );
 
-    // Entry reveal ScrollTrigger: pops the letters as the section scrolls into view
+    // Entry reveal ScrollTrigger: pops the title as the section scrolls into view
     let entryST = null;
     const titleEl = document.querySelector('.c5-title');
     if (titleEl) {
-      const titleLetters = titleEl.querySelectorAll('.c5-title-letter');
-      if (titleLetters.length > 0) {
-        // Set initial values
-        gsap.set(titleLetters, { opacity: 0, scale: 0.3, y: 35, transformOrigin: 'center bottom' });
+      // Set initial values
+      gsap.set(titleEl, { opacity: 0, scale: 0.8, y: 35, transformOrigin: 'center bottom' });
 
-        entryST = ScrollTrigger.create({
-          trigger: sectionRef.current,
-          start: 'top bottom', // Starts when the top of Chapter 5 enters the bottom of viewport
-          end: 'top 5%',       // Completes just before it pins
-          scrub: 0.5,
-          animation: gsap.to(
-            titleLetters,
-            {
-              opacity: 1,
-              scale: 1,
-              y: 0,
-              textShadow: '0 0 10px rgba(143, 216, 210, 0.6)',
-              stagger: 0.05,
-              ease: 'back.out(2)', // springy bounce pop-out
-            }
-          )
-        });
-      }
+      entryST = ScrollTrigger.create({
+        trigger: sectionRef.current,
+        start: 'top bottom', // Starts when the top of Chapter 5 enters the bottom of viewport
+        end: 'top 5%',       // Completes just before it pins
+        scrub: 0.5,
+        animation: gsap.to(
+          titleEl,
+          {
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            ease: 'back.out(2)', // springy bounce pop-out
+          }
+        )
+      });
     }
 
     // Fade out the entire category header near the end of scroll
@@ -606,8 +602,38 @@ function BeltScene() {
           role="button"
           aria-label="Navigate to Software Projects"
         >
-          <span className="c5-desktop-text">SOFTWARE PROJECTS</span>
-          <span className="c5-mobile-text">SOFTWARE</span>
+          <span className="c5-desktop-text" style={{ pointerEvents: 'none' }}>
+            <FuzzyText
+              fontSize="clamp(1.1rem, 2.2vw, 1.45rem)"
+              fontWeight={activeCategory === 'software' ? 700 : 400}
+              fontFamily="'Rubik Glitch', system-ui"
+              color={activeCategory === 'software' ? '#00ff00' : '#006600'}
+              baseIntensity={activeCategory === 'software' ? 0.2 : 0.08}
+              hoverIntensity={0.5}
+              fuzzRange={5}
+              clickEffect={true}
+              transitionDuration={150}
+              direction="both"
+            >
+              SOFTWARE PROJECTS
+            </FuzzyText>
+          </span>
+          <span className="c5-mobile-text" style={{ pointerEvents: 'none' }}>
+            <FuzzyText
+              fontSize="clamp(1.1rem, 2.2vw, 1.45rem)"
+              fontWeight={activeCategory === 'software' ? 700 : 400}
+              fontFamily="'Rubik Glitch', system-ui"
+              color={activeCategory === 'software' ? '#00ff00' : '#006600'}
+              baseIntensity={activeCategory === 'software' ? 0.2 : 0.08}
+              hoverIntensity={0.5}
+              fuzzRange={5}
+              clickEffect={true}
+              transitionDuration={150}
+              direction="both"
+            >
+              SOFTWARE
+            </FuzzyText>
+          </span>
           <div className="c5-category-underline" />
         </h3>
         <div className="c5-category-divider">|</div>
@@ -625,8 +651,38 @@ function BeltScene() {
           role="button"
           aria-label="Navigate to Hardware Projects"
         >
-          <span className="c5-desktop-text">HARDWARE PROJECTS</span>
-          <span className="c5-mobile-text">HARDWARE</span>
+          <span className="c5-desktop-text" style={{ pointerEvents: 'none' }}>
+            <FuzzyText
+              fontSize="clamp(1.1rem, 2.2vw, 1.45rem)"
+              fontWeight={activeCategory === 'hardware' ? 700 : 400}
+              fontFamily="'Rubik Glitch', system-ui"
+              color={activeCategory === 'hardware' ? '#00ff00' : '#006600'}
+              baseIntensity={activeCategory === 'hardware' ? 0.2 : 0.08}
+              hoverIntensity={0.5}
+              fuzzRange={5}
+              clickEffect={true}
+              transitionDuration={150}
+              direction="both"
+            >
+              HARDWARE PROJECTS
+            </FuzzyText>
+          </span>
+          <span className="c5-mobile-text" style={{ pointerEvents: 'none' }}>
+            <FuzzyText
+              fontSize="clamp(1.1rem, 2.2vw, 1.45rem)"
+              fontWeight={activeCategory === 'hardware' ? 700 : 400}
+              fontFamily="'Rubik Glitch', system-ui"
+              color={activeCategory === 'hardware' ? '#00ff00' : '#006600'}
+              baseIntensity={activeCategory === 'hardware' ? 0.2 : 0.08}
+              hoverIntensity={0.5}
+              fuzzRange={5}
+              clickEffect={true}
+              transitionDuration={150}
+              direction="both"
+            >
+              HARDWARE
+            </FuzzyText>
+          </span>
           <div className="c5-category-underline" />
         </h3>
       </div>

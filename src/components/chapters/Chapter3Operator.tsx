@@ -3,6 +3,7 @@ import { useSectionProgress } from '../../animations/hooks/useSectionProgress';
 import { useCms } from '../../providers/CmsProvider';
 import styles from './Chapter3Operator.module.css';
 import ResolvedImage from '../common/ResolvedImage';
+import { FuzzyText } from '../common/FuzzyText';
 
 export const Chapter3Operator: React.FC = () => {
   const sectionRef = React.useRef<HTMLElement>(null);
@@ -58,8 +59,22 @@ export const Chapter3Operator: React.FC = () => {
 
       {/* Section Content */}
       <div className={styles.contentContainer}>
-        <div className={styles.sectionHeader}>
-          <span className={styles.promptSymbol}>&gt;</span> INTRODUCTION
+        <div className={styles.sectionHeader} style={{ display: 'flex', alignItems: 'center' }}>
+          <span className={styles.promptSymbol}>&gt;</span>
+          <FuzzyText
+            fontSize="clamp(18px, 2.5vw, 24px)"
+            fontWeight="normal"
+            fontFamily="'Rubik Glitch', system-ui"
+            color="#00ff00"
+            baseIntensity={0.18}
+            hoverIntensity={0.5}
+            fuzzRange={6}
+            clickEffect={true}
+            transitionDuration={150}
+            direction="both"
+          >
+            INTRODUCTION
+          </FuzzyText>
         </div>
         <div className={styles.dividerLine} />
 

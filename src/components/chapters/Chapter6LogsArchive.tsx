@@ -15,6 +15,7 @@ import TerminalText from '../common/TerminalText';
 import { type DevLog } from '../../data/devlogs';
 import { useCms } from '../../providers/CmsProvider';
 import styles from './Chapter6LogsArchive.module.css';
+import { FuzzyText } from '../common/FuzzyText';
 
 /* ────────────────────────────────────────────────────────────
    TYPES
@@ -515,8 +516,21 @@ export default function Chapter6LogsArchive() {
           <p className={styles.chapterLabel}>
             <span className={styles.floatText}>[ Chapter 06 ]</span>
           </p>
-          <h2 className={styles.title}>
-            <span className={styles.floatText}>LOGS ARCHIVE</span>
+          <h2 className={styles.title} style={{ display: 'flex', justifyContent: 'center' }}>
+            <FuzzyText
+              fontSize="clamp(28px, 4vw, 44px)"
+              fontWeight={300}
+              fontFamily="'Rubik Glitch', system-ui"
+              color="#00ff00"
+              baseIntensity={0.18}
+              hoverIntensity={0.5}
+              fuzzRange={8}
+              clickEffect={true}
+              transitionDuration={150}
+              direction="both"
+            >
+              LOGS ARCHIVE
+            </FuzzyText>
           </h2>
         </div>
 
