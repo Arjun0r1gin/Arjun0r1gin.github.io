@@ -74,7 +74,7 @@ const DEFAULT_PROFILES: ProfileData[] = [
     name: 'ARJUN V',
     title: 'OPERATOR DOSSIER // SECURE TERMINAL',
     subtitle: 'Cybersecurity and IoT Specialist',
-    description: "Hello! I'm Arjun, a 2nd year Computer Science & Engineering student at RVCE, Bangalore. My passion for programming and cybersecurity began in 6th grade, and I focus on secure embedded flight systems and hardware triage.",
+    description: "Hello! I'm Arjun, a 2nd year Computer Science & Engineering student at EPCET, Bengaluru. My passion for Space and cybersecurity began in 7th grade, and I am currently leveling up my skills in embedded systems and security systems.",
     skills: 'C/C++, Embedded Software, Network Security, Telemetry Ingestion, CanSat Systems, Scripting',
     technologies: 'React, Vite, GSAP, RTOS, Linux Kernel, Git, Canvas API',
     resumeLink: '#',
